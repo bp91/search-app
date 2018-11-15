@@ -1,0 +1,41 @@
+body {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #5e5e5e;
+}
+
+.page {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #5e5e5e;
+}
+
+h1, h2, h3, h4, h5, h6 { 
+	font-family: 'Open Sans', Arial, Helvetice Neue, sans-serif; 
+}
+
+.header {
+	z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-width: 320px;
+    box-sizing: border-box;
+}
+
+.page-content {
+	margin-top: 70px;
+}
+
+.row-line {
+    margin-top: 80px;
+}
+
+.logo {
+	height: 30px;
+	background: url("../../img/igenius.png") no-repeat;
+	margin: 10px 0px 20px 20px;
+}

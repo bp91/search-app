@@ -1,0 +1,14 @@
+{
+    "server": {
+        "development" : {
+            "url": "http://localhost",
+            "domain": "localhost",
+            "port": "8081"
+        },
+        "production" : {
+            "url": "http://localhost",
+            "domain": "localhost",
+            "port": "80"
+        }
+    }
+}

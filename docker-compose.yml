@@ -1,0 +1,66 @@
+networks:
+    default:
+        ipam:
+            config:
+                - subnet: 10.48.0.0/16
+                  gateway: 10.48.0.1
+services:
+    haproxy:
+        build: haproxy
+        container_name: haproxy
+        volumes:
+            - ./haproxy/conf/:/usr/local/etc/haproxy/
+            - ./haproxy/ssl/:/etc/ssl/xip.io/
+        ports:
+            - "80:80"
+            - "443:443"
+        networks: 
+            default:
+                ipv4_address: 10.48.0.2
+                
+    postgres:
+        image: postgres:latest
+        container_name: postgres
+        restart: always
+        environment:
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./postgres/sql:/docker-entrypoint-initdb.d
+        networks: 
+            default:
+                ipv4_address: 10.48.0.3
+
+    server:
+        build: server
+        container_name: server
+        restart: always
+        environment:
+            - ENV=env=production db=true
+        ports:
+            - "8081:8081"
+        volumes:
+            - ./server/config:/usr/src/app/config
+        depends_on: 
+            - haproxy
+            - postgres
+        networks: 
+            default:
+                ipv4_address: 10.48.0.4
+
+    frontend:
+        build: frontend
+        container_name: frontend
+        restart: always
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./frontend/config:/usr/src/app/config
+        depends_on: 
+            - server
+        networks: 
+            default:
+                ipv4_address: 10.48.0.5
+version: '2'

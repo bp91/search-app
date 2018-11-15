@@ -1,0 +1,24 @@
+{
+  "development": {
+    "database" : {
+      "username": "postgres",
+      "password": "postgres",
+      "database": "converter",
+      "host": "localhost",
+      "port": 5432,
+      "dialect": "postgres"
+    },
+    "server_host" : "http://localhost:8081"
+  },
+  "production": {
+    "database" : {
+      "username": "postgres",
+      "password": "postgres",
+      "database": "converter",
+      "host": "10.48.0.3",
+      "port": 5432,
+      "dialect": "postgres"
+    },
+    "server_host" : "http://10.48.0.4:8081"
+  }
+}

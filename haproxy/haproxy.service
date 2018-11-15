@@ -1,0 +1,95 @@
+#!/bin/sh
+# 
+# processname: haproxy
+# config: /opt/haproxy/haproxy.cfg
+# pidfile: /var/run/haproxy.pid
+
+[ -f /usr/local/etc/haproxy/haproxy.cfg ] || exit 1
+
+RETVAL=0
+
+start() {
+  /usr/bin/haproxy -c -q -f /usr/local/etc/haproxy/haproxy.cfg
+  if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with 'haproxy check'."
+    return 1
+  fi
+
+  echo -n "Starting haproxy: "
+  /usr/bin/haproxy -D -f /usr/local/etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && touch /var/lock/subsys/haproxy
+  return $RETVAL
+}
+
+stop() {
+  echo -n "Shutting down haproxy: "
+  killproc haproxy -USR1
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/haproxy
+  [ $RETVAL -eq 0 ] && rm -f /var/run/haproxy.pid
+  return $RETVAL
+}
+
+restart() {
+  /usr/bin/haproxy -c -q -f /usr/local/etc/haproxy/haproxy.cfg
+  if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with 'haproxy check'."
+    return 1
+  fi
+  stop
+  start
+}
+
+reload() {
+  /usr/bin/haproxy -c -q -f /usr/local/etc/haproxy/haproxy.cfg
+  if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with 'haproxy check'."
+    return 1
+  fi
+  /usr/bin/haproxy -D -f /usr/local/etc/haproxy/haproxy.cfg -p /var/run/haproxy.pid -sf $(cat /var/run/haproxy.pid)
+}
+
+check() {
+  /usr/bin/haproxy -c -q -V -f /usr/local/etc/haproxy/haproxy.cfg
+}
+
+rhstatus() {
+  status haproxy
+}
+
+condrestart() {
+  [ -e /var/lock/subsys/haproxy ] && restart || :
+}
+
+# See how we were called.
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  reload)
+    reload
+    ;;
+  condrestart)
+    condrestart
+    ;;
+  status)
+    rhstatus
+    ;;
+  check)
+    check
+    ;;
+  *)
+    echo $"Usage: haproxy {start|stop|restart|reload|condrestart|status|check}"
+    exit 1
+esac
+ 
+exit $?
