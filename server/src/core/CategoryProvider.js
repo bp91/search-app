@@ -3,6 +3,7 @@ const log = log4js.getLogger("default");
 const alasql = require('alasql');
 const fields = require("../db/enum/CategoryFields").CategoryFields;
 const QueryConstructor = require("../utils/QueryConstructor");
+const SearchUtils = require("../utils/SearchUtils");
 
 class CategoryProvider {
     constructor(index) {
@@ -26,18 +27,12 @@ CategoryProvider.prototype.checkField = function(field, value) {
     }
 };
 
-CategoryProvider.prototype.getCategory = function(params) {
-    let query;
-    if(Object.keys(params).length > 1) {
-        query = QueryConstructor.multiQuery(fields, params);
-    }else {
-        query = QueryConstructor.singleQuery(fields, params);
-    }
-
+CategoryProvider.prototype.getCategory = async function(params) {
     try {
+        response = await SearchUtils.recursiveSearch(this.index, fields, params);
         return  {
             "status" : 200,
-            "message" : alasql(query,[this.index])
+            "message" : response
         }
     }catch(e) {
         log.error(e);

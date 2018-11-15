@@ -21,12 +21,12 @@ function checkParams(req, res, next) {
     }
 };
 
-function getCategory(req, res) {
+async function getCategory(req, res) {
     /**
      * Maybe in the future you want to search for categories indexed by date
      */
     categoryProvider = new CategoryProvider(categories);
-    const response = categoryProvider.getCategory(req.query);
+    const response = await categoryProvider.getCategory(req.query);
     res.status(response.status).send(response.message);
 };
 
