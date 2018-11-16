@@ -1,19 +1,18 @@
 const log4js = require('log4js');
 const log = log4js.getLogger("default");
-const fields = require("../db/enum/CategoryFields").CategoryFields;
-const QueryConstructor = require("../utils/QueryConstructor");
+const fields = require("../db/enum/PsychographicFields").PsychographicFields;
 const SearchUtils = require("../utils/SearchUtils");
 
-class CategoryProvider {
+class PsychographicProvider {
     constructor(index) {
         this.index = index;
     }
 };
 
-CategoryProvider.prototype.checkField = function(field, value) {
+PsychographicProvider.prototype.checkField = function(field, value) {
     if(fields.hasOwnProperty(field)) {
         if(field == "operator") {
-            if(fields.operator.includes(value.toUpperCase())) {
+            if(fields.operator.includes(value)) {
                 return true;
             }else {
                 return false;
@@ -34,11 +33,10 @@ CategoryProvider.prototype.checkField = function(field, value) {
     }
 };
 
-CategoryProvider.prototype.getCategories = async function(params) {
-    log.info("CategoryProvider.js: getCategories");
+PsychographicProvider.prototype.getPsychographics = async function(params) {
+    log.info("PsychographicProvider.js: getPsychographics");
     if(!params.fixedLevel) {
         try {
-            delete params.fixedLevel;
             response = await SearchUtils.recursiveSearch(this.index, fields, params);
             return  {
                 "status" : 200,
@@ -59,7 +57,7 @@ CategoryProvider.prototype.getCategories = async function(params) {
     }
 };
 
-CategoryProvider.prototype.getCategoriesFromLayer = async function(params) {
+PsychographicProvider.prototype.getPsychographicsFromLayer = async function(params) {
     try {
         const jumpLevel = params.fixedLevel;
         delete params.fixedLevel;
@@ -79,5 +77,5 @@ CategoryProvider.prototype.getCategoriesFromLayer = async function(params) {
 
 
 module.exports = {
-    CategoryProvider
+    PsychographicProvider
 };

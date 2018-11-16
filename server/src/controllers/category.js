@@ -5,6 +5,7 @@ const CategoryProvider = require("../core/CategoryProvider").CategoryProvider;
 let categoryProvider;
 
 function checkParams(req, res, next) {
+    log.info("category.js: checkParams");
     categoryProvider = new CategoryProvider(categories);
     let goNext = true;
     for(var key in req.query) {
@@ -21,16 +22,26 @@ function checkParams(req, res, next) {
     }
 };
 
-async function getCategory(req, res) {
+async function getCategories(req, res) {
+    log.info("category.js: getCategories");
     /**
      * Maybe in the future you want to search for categories indexed by date
      */
-    categoryProvider = new CategoryProvider(categories);
-    const response = await categoryProvider.getCategory(req.query);
+    const response = await categoryProvider.getCategories(req.query);
+    res.status(response.status).send(response.message);
+};
+
+async function getCategoriesFixedLevel(req, res) {
+    log.info("category.js: getCategoriesFixedLevel");
+    /**
+     * Maybe in the future you want to search for categories indexed by date
+     */
+    const response = await categoryProvider.getCategoriesFromLayer(req.query);
     res.status(response.status).send(response.message);
 };
 
 module.exports = {
     checkParams : checkParams,
-    getCategory : getCategory
+    getCategories : getCategories,
+    getCategoriesFixedLevel : getCategoriesFixedLevel
 };

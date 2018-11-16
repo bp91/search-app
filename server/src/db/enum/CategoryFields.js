@@ -23,6 +23,14 @@ const CategoryFields = {
         'value' : 'id',
         'type' : 'object'
     },
+    'fixedLevel' : {
+        'value' : 'fixedLevel',
+        'type' : 'int'
+    },
+    'children': {
+        'value' : 'children',
+        'type' : 'object'
+    },
     'operator' : ["AND", "OR"]
 };
 

@@ -31,6 +31,10 @@ const PsychographicFields = {
         'value' : 'addonId',
         'type' : 'string'
     },
+    'fixedLevel' : {
+        'value' : 'fixedLevel',
+        'type' : 'int'
+    },
     'operator' : ['AND', 'OR']
 };
 
