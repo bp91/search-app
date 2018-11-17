@@ -10,16 +10,32 @@ function concatParams(sub, params, fields, operator) {
     for(var key in params) {
         if(query == "") {
             if(fields[key].type == "string") {
-                query = "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                if(sub[key] == undefined) {
+                    query = "1==2";
+                }else {
+                    query = "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                }
             }else if(fields[key].type == "int"){
-                query = sub[key] + "==" + params[key];
+                if(sub[key] == undefined) {
+                    query = "1==2";
+                }else {
+                    query = sub[key] + "==" + params[key];
+                }
             }
         }else {
             if(fields[key].type == "string") {
-                query = query + operator + "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                if(sub[key] == undefined) {
+                    query = query + operator + "1==2";
+                }else {
+                    query = query + operator + "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                }
        
             }else if(fields[key].type == "int"){
-                query = query + operator + sub[key] + "==" + params[key];
+                if(sub[key] == undefined) {
+                    query = query + operator + "1==2";
+                }else {
+                    query = query + operator + sub[key] + "==" + params[key];
+                }
             }
         }
     }

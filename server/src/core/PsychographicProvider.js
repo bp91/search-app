@@ -16,7 +16,7 @@ PsychographicProvider.prototype.setIndex = function(index) {
 PsychographicProvider.prototype.checkField = function(field, value) {
     if(fields.hasOwnProperty(field)) {
         if(field == "operator") {
-            if(fields.operator.includes(value)) {
+            if(fields.operator.includes(value.toUpperCase())) {
                 return true;
             }else {
                 return false;
@@ -39,29 +39,20 @@ PsychographicProvider.prototype.checkField = function(field, value) {
 
 PsychographicProvider.prototype.getPsychographics = async function(params) {
     log.info("PsychographicProvider.js: getPsychographics");
-    if(!params.fixedLevel) {
-        try {
-            response = await SearchUtils.recursiveSearch(this.index, fields, params);
-            return  {
-                "status" : 200,
-                "message" : response
-            }
-        }catch(e) {
-            log.error(e);
-            return {
-                "status" : 404,
-                "message" : {
-                    "message" : e
-                }
-            };
+    try {
+        response = await SearchUtils.recursiveSearch(this.index, fields, params);
+        return  {
+            "status" : 200,
+            "message" : response.value
         }
-    }else {
+    }catch(e) {
+        log.error(e);
         return {
             "status" : 404,
             "message" : {
-                "message" : "Wrong Parameters"
+                "message" : e
             }
-        }
+        };
     }
 };
 
@@ -70,12 +61,10 @@ PsychographicProvider.prototype.getPsychographicsFromLayer = async function(para
         const jumpLevel = params.fixedLevel;
         delete params.fixedLevel;
         response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
-        return {
-            "status" : 404,
-            "message" : {
-                "message" : e
-            }
-        };
+        return  {
+            "status" : 200,
+            "message" : response.value
+        }
     }catch(e) {
         log.error(e);
         return {

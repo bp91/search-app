@@ -35,14 +35,17 @@ function checkParamsPsychographics(req, res, next) {
     var parameters = Object.keys(req.query);
     if(parameters.length > 1) {
         if(parameters.includes("fixedLevel") || (!parameters.includes("fixedLevel") && !parameters.includes("operator"))) {
+            log.error("psychographics.js: checkParamsPsychographics: missing operator or fixedLevel presence");
             goNext = false;
         }
         parameters.splice(parameters.indexOf("operator"), 1);
         if(parameters.length == 1) {
+            log.error("psychographics.js: checkParamsPsychographics: missing other field for operator");
             goNext = false;
         }
     }else {
         if(parameters.includes("fixedLevel") || parameters.includes("operator")) {
+            log.error("psychographics.js: checkParamsPsychographics: no field passed");
             goNext = false;
         }
     }
