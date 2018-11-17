@@ -36,10 +36,29 @@
         </div>
         <div class="row">
             <div class="col-xs-2 filters">
-
+                <div class="row operator">
+                    <div class="col-xs-12">
+                        <select>
+                            <option v-for="operator in operators" :key="operator">{{operator}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div v-if="selectedIndex == 'categories'" class="categoriesFilters">
+                            <select>
+                                <option v-for="category in categoriesFilters" :key="category.value">{{category.value}}</option>
+                            </select>
+                        </div>
+                        <div v-if="selectedIndex == 'psychographics'" class="psychographicsFilters">
+                            <select>
+                                <option v-for="psychographic in psychographicsFilters" :key="psychographic.value">{{psychographic.value}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-xs-8 results">
-
             </div>
             <div class="col-xs-2">
             </div>
@@ -47,33 +66,146 @@
     </div>    
 </template>
 <script>
-export default {
-    data() {
-        return {
-            searchInput : "",
-            errorMessage : "",
-            disableSend : true,
-            indices : [
-                {
-                    "id" : 1,
-                    "value" : "categories"
-                }, 
-                {
-                    "id" : 2, 
-                    "value" : "psychographics"
-                }
-            ],
-            selectedIndex : "categories"
+    import axios from 'axios';
+    import jsonArray from 'json-array-split';
+    const env = process.env.NODE_ENV || 'development';
+    const config = require("../../config/config.json").server[env];
+    export default {
+        data() {
+            return {
+                searchInput : "",
+                errorMessage : "",
+                disableSend : true,
+                indices : [
+                    {
+                        "id" : 1,
+                        "value" : "categories"
+                    }, 
+                    {
+                        "id" : 2, 
+                        "value" : "psychographics"
+                    }
+                ],
+                operators : ["AND", "OR"],
+                selectedIndex : "categories",
+                activeFilters : {},
+                categoriesFilters : [],
+                psychographicsFilters : []
+            }
+        },
+        mounted() {
+            this.searchInput = this.$store.state.searchInput != undefined ? this.$store.state.searchInput : "";
+            this.indices = this.$store.state.indices != undefined ? this.$store.state.indices : this.indices;
+            this.selectedIndex = this.$store.state.selectedIndex != undefined? this.$store.state.selectedIndex : "";
+            this.activeFilters = this.$store.state.activeFilters != undefined? this.$store.state.activeFilters : {};
+            
+            if(this.searchInput != "") {
+                this.activeFilters["name"] = this.searchInput;
+            }
+            if(this.categoriesFilters.length == 0) {
+                this.getCategoriesSchema();
+            }
+            if(this.psychographicsFilters.length == 0) {
+                this.getPsychographicsSchema();
+            }
+        },
+        methods: {
+            getCategoriesSchema() {
+                axios.get(config.url + ":" + config.port + "/categoriesSchemaFields"
+                ).then(response => {
+                    if(response.data.hasOwnProperty("message")) {
+                        for(var key in response.data.value) {
+                            this.categoriesFilters.push(response.data.value[key]);
+                        }
+                    }else {
+                        this.categoriesFilters = response.data;
+                    }
+                }).catch(error => {
+                    if(error.hasOwnProperty("response")) {
+                        if(error.response.hasOwnProperty("data")) {
+                            if(error.response.data.hasOwnProperty("message")) {
+                                this.errorMessage = error.response.data.message;
+                            }else {
+                                this.errorMessage = error.response.data;
+                            }
+                        }else {
+                            this.errorMessage = error.response;
+                        }
+                    }else {
+                        this.errorMessage = error;
+                    }
+                });
+            },
+            getPsychographicsSchema() {
+                axios.get(config.url + ":" + config.port + "/psychographicsSchemaFields"
+                ).then(response => {
+                    if(response.data.hasOwnProperty("message")) {
+                        for(var key in response.data.value) {
+                            this.psychographicsFilters.push(response.data.value[key]);
+                        }
+                    }else {
+                        this.psychographicsFilters = response.data;
+                    }
+                    
+                }).catch(error => {
+                    if(error.hasOwnProperty("response")) {
+                        if(error.response.hasOwnProperty("data")) {
+                            if(error.response.data.hasOwnProperty("message")) {
+                                this.errorMessage = error.response.data.message;
+                            }else {
+                                this.errorMessage = error.response.data;
+                            }
+                        }else {
+                            this.errorMessage = error.response;
+                        }
+                    }else {
+                        this.errorMessage = error;
+                    }
+                });
+            }
         }
-    },
-    mounted() {
-        this.searchInput = this.$store.state.searchInput != undefined ? this.$store.state.searchInput : "";
-        this.indices = this.$store.state.indices != undefined ? this.$store.state.indices : this.indices;
-        this.selectedIndex = this.$store.state.selectedIndex != undefined? this.$store.state.selectedIndex : "";
-    },
-}
+    };
 </script>
 <style>
+    .operator select {
+        margin-left: -32px;
+    }
 
+    .inputBox input {
+        width: 100%;
+    }
+
+    input[type=text], select {
+        padding: 7px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .indexSelect select {
+        width: 100%
+    }
+
+    .sendBox button {
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 3px 20px;
+        margin-top: 6px;
+        margin-left: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .sendBox button:hover {
+        background-color: #45a049;
+    }
+
+    .buttonDisabled {
+        background-color: #88e88c;
+    }
 </style>
 
