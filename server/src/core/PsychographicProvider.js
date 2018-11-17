@@ -42,7 +42,7 @@ PsychographicProvider.prototype.getPsychographics = async function(params) {
     try {
         response = await SearchUtils.recursiveSearch(this.index, fields, params);
         return  {
-            "status" : 200,
+            "status" : response.status,
             "message" : response.value
         }
     }catch(e) {
@@ -62,14 +62,16 @@ PsychographicProvider.prototype.getPsychographicsFromLayer = async function(para
         delete params.fixedLevel;
         response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
         return  {
-            "status" : 200,
+            "status" : response.status,
             "message" : response.value
         }
     }catch(e) {
         log.error(e);
         return {
             "status" : 404,
-            "message" : e
+            "message" : {
+                "message" : e
+            }
         };
     }
 };

@@ -4,6 +4,10 @@ const categories = require("../../index/categories.json");
 const CategoryProvider = require("../core/CategoryProvider").CategoryProvider;
 let categoryProvider = new CategoryProvider();
 
+/**
+ * This method controls if passed parameters are allowed in the enum schema defined
+ * for the current index type
+ */
 function checkFields(req, res, next) {
     log.info("category.js: checkFields");
     let goNext = true;
@@ -21,6 +25,10 @@ function checkFields(req, res, next) {
     }
 };
 
+/**
+* This methods controls if there are no missing parameters for the requested service:
+ * ex: presence of fixedLevel or multiparameters query without the operator field
+ */
 function checkParamsCategories(req, res, next) {
     log.info("category.js: checkParamsCategories");
     let goNext = true;
@@ -47,6 +55,10 @@ function checkParamsCategories(req, res, next) {
     }
 };
 
+/**
+ * This methods controls if there are no missing parameters for the requested service:
+ * ex: missing fixedLevel or multiparameters query without the operator field
+ */
 function checkParamsCategoriesFixedLevel(req, res, next) {
     log.info("category.js: checkParamsCategoriesCategoriesFixedLevel");
     let goNext = true;

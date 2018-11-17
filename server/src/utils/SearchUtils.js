@@ -13,7 +13,7 @@ function concatParams(sub, params, fields, operator) {
                 if(sub[key] == undefined) {
                     query = "1==2";
                 }else {
-                    query = "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                    query = "'" + sub[key].toString().replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].toString().replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
                 }
             }else if(fields[key].type == "int"){
                 if(sub[key] == undefined) {
@@ -27,7 +27,7 @@ function concatParams(sub, params, fields, operator) {
                 if(sub[key] == undefined) {
                     query = query + operator + "1==2";
                 }else {
-                    query = query + operator + "'" + sub[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
+                    query = query + operator + "'" + sub[key].toString().replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'=='" + params[key].toString().replace(/\\/g, "\\\\").replace(/\$/g, "\\$").replace(/'/g, "\\'").replace(/"/g, "\\\"") + "'";
                 }
        
             }else if(fields[key].type == "int"){

@@ -20,7 +20,7 @@ function checkFields(req, res, next) {
         return next();
     }else {
         res.status(404).send({
-            "message" : "Wrong parameters"
+            "message" : "Wrong Parameters"
         });
     }
 };
@@ -124,5 +124,5 @@ module.exports = {
     checkParamsPsychographicsFixedLevel : checkParamsPsychographicsFixedLevel,
     getPsychographics : getPsychographics,
     getPsychographicsFixedLevel : getPsychographicsFixedLevel,
-    handlle : handle
+    handle : handle
 };

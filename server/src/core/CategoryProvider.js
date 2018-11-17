@@ -62,7 +62,7 @@ CategoryProvider.prototype.getCategoriesFromLayer = async function(params) {
         delete params.fixedLevel;
         response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
         return  {
-            "status" : 200,
+            "status" : response.status,
             "message" : response.value
         }
     }catch(e) {

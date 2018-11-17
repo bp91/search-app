@@ -17,7 +17,7 @@ const PsychographicFields = {
     },
     'id': {
         'value' : 'id',
-        'type' : 'int'
+        'type' : 'string'
     },
     'label': {
         'value' : 'label',
