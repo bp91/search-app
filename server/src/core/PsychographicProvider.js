@@ -37,6 +37,10 @@ PsychographicProvider.prototype.checkField = function(field, value) {
     }
 };
 
+PsychographicProvider.prototype.getSchemaFields = function() {
+    return fields;
+};
+
 PsychographicProvider.prototype.getPsychographics = async function(params) {
     log.info("PsychographicProvider.js: getPsychographics");
     try {

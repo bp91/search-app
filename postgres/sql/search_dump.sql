@@ -11,8 +11,8 @@ SET standard_conforming_strings = on;
 -- Roles
 --
 
-CREATE ROLE converter;
-ALTER ROLE converter WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'converter';
+CREATE ROLE searchengine;
+ALTER ROLE searchengine WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'searchengine';
 -- CREATE ROLE postgres;
 -- ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS;
 
@@ -25,12 +25,12 @@ ALTER ROLE converter WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NORE
 -- Database creation
 --
 
-CREATE DATABASE converter WITH TEMPLATE = template0 OWNER = converter;
+CREATE DATABASE searchengine WITH TEMPLATE = template0 OWNER = searchengine;
 REVOKE CONNECT,TEMPORARY ON DATABASE template1 FROM PUBLIC;
 GRANT CONNECT ON DATABASE template1 TO PUBLIC;
 
 
-\connect converter
+\connect searchengine
 
 SET default_transaction_read_only = off;
 
@@ -66,7 +66,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
--- Name: instr(character varying, character varying); Type: FUNCTION; Schema: public; Owner: converter
+-- Name: instr(character varying, character varying); Type: FUNCTION; Schema: public; Owner: searchengine
 --
 
 CREATE FUNCTION public.instr(character varying, character varying) RETURNS integer
@@ -81,10 +81,10 @@ END;
 $_$;
 
 
-ALTER FUNCTION public.instr(character varying, character varying) OWNER TO converter;
+ALTER FUNCTION public.instr(character varying, character varying) OWNER TO searchengine;
 
 --
--- Name: instr(character varying, character varying, integer); Type: FUNCTION; Schema: public; Owner: converter
+-- Name: instr(character varying, character varying, integer); Type: FUNCTION; Schema: public; Owner: searchengine
 --
 
 CREATE FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer) RETURNS integer
@@ -128,10 +128,10 @@ END;
 $$;
 
 
-ALTER FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer) OWNER TO converter;
+ALTER FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer) OWNER TO searchengine;
 
 --
--- Name: instr(character varying, character varying, integer, integer); Type: FUNCTION; Schema: public; Owner: converter
+-- Name: instr(character varying, character varying, integer, integer); Type: FUNCTION; Schema: public; Owner: searchengine
 --
 
 CREATE FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer, occur_index integer) RETURNS integer
@@ -193,57 +193,51 @@ END;
 $$;
 
 
-ALTER FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer, occur_index integer) OWNER TO converter;
+ALTER FUNCTION public.instr(string character varying, string_to_search character varying, beg_index integer, occur_index integer) OWNER TO searchengine;
 
 --
--- Name: currency; Type: TABLE; Schema: public; Owner: converter
+-- Name: currency; Type: TABLE; Schema: public; Owner: searchengine
 --
 
-CREATE TABLE public.currency (
+CREATE TABLE public.indexschemafield (
   id serial NOT NULL,
   name character varying(255),
   value character varying(255),
-
-  CONSTRAINT currency_pk PRIMARY KEY (name)
+  type character varying(255),
+  index_type character varying(255),
+  
+  CONSTRAINT indexschemafield_pk PRIMARY KEY (id)
 );
 
-INSERT INTO public.currency(
-  name, value) 
-  VALUES ('EUR', 'EUR'), 
-  ('USD', 'USD'), 
-  ('JPY', 'JPY'), 
-  ('BGN', 'BGN'), 
-  ('CZK', 'CZK'), 
-  ('DKK', 'DKK'), 
-  ('GBP', 'GBP'),
-  ('HUF', 'HUF'),
-  ('PLN', 'PLN'),
-  ('RON', 'RON'),
-  ('SEK', 'SEK'),
-  ('CHF', 'CHF'),
-  ('ISK', 'ISK'),
-  ('NOK', 'NOK'),
-  ('HRK', 'HRK'),
-  ('RUB', 'RUB'),
-  ('TRY', 'TRY'),
-  ('AUD', 'AUD'),
-  ('BRL', 'BRL'),
-  ('CAD', 'CAD'),
-  ('CNY', 'CNY'),
-  ('HKD', 'HKD'),
-  ('IDR', 'IDR'),
-  ('ILS', 'ILS'),
-  ('INR', 'INR'),
-  ('KRW', 'KRW'),
-  ('MXN', 'MXN'),
-  ('MYR', 'MYR'),
-  ('NZD', 'NZD'),
-  ('PHP', 'PHP'),
-  ('SGD', 'SGD'),
-  ('THB', 'THB'),
-  ('ZAR', 'ZAR');
+GRANT ALL PRIVILEGES ON TABLE public.indexschemafield TO searchengine;
 
-ALTER TABLE public.currency OWNER TO converter;
+INSERT INTO public.indexschemafield(
+  name, value, type, index_type) 
+  VALUES 
+  ('children', 'children', 'object', 'category'), 
+  ('fixedLevel', 'fixedLevel', 'int', 'category'),
+  ('id', 'id', 'int', 'category'),
+  ('l1', 'l1', 'int', 'category'),
+  ('l2', 'l2', 'int', 'category'),
+  ('l3', 'l3', 'int', 'category'),
+  ('l4', 'l4', 'int', 'category'),
+  ('level', 'level', 'int', 'category'),
+  ('name', 'name', 'string', 'category'),
+  ('type', 'type', 'string', 'category'),
+  ('operator', 'AND, OR', 'operator', 'category'),
+  ('addonId', 'addonId', 'string', 'psychographic'),
+  ('description', 'description', 'string', 'psychographic'),
+  ('fixedLevel', 'fixedLevel', 'string', 'psychographic'),
+  ('ico', 'ico', 'string', 'psychographic'),
+  ('id', 'id', 'string', 'psychographic'),
+  ('label', 'label', 'string', 'psychographic'),
+  ('pic', 'pic', 'string', 'psychographic'),
+  ('sources', 'sources', 'array', 'psychographic'),
+  ('value', 'value', 'string', 'psychographic'),
+  ('values', 'values', 'object', 'psychographic'),
+  ('operator', 'AND, OR', 'operator', 'psychographic');
+
+ALTER TABLE public.indexschemafield OWNER TO searchengine;
 
 GRANT ALL ON SCHEMA public TO PUBLIC;
 

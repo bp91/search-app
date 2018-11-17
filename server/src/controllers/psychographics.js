@@ -1,9 +1,14 @@
 const log4js = require('log4js');
 const log = log4js.getLogger("default");
+const dbEnv = require('../utils/EnvUtils').getDbEnv();
+const Field = require('../db/models').indexschemafield;
 const psychographics = require("../../index/psychographics.json");
 const PsychographicProvider = require("../core/PsychographicProvider").PsychographicProvider;
 let psychographicProvider = new PsychographicProvider();
-
+let Sequelize;
+if(dbEnv == "true") {
+    Sequelize = require("./../db/models/index").Sequelize;
+}
 /**
  * This method controls if passed parameters are allowed in the enum schema defined
  * for the current index type
@@ -94,6 +99,24 @@ function checkParamsPsychographicsFixedLevel(req, res, next) {
     }
 };
 
+function getPsychographicsSchemaFields(req, res) {
+    if(dbEnv == "true") {
+        Field.findAll({
+            where : {
+                index_type : "psychographic"
+            }
+        }).then(fields => {
+            return res.status(200).json(fields);
+        });
+    }else {
+        log.info("psychographic.js: getPsychographicsSchemaFields: No DB Connection");
+        return res.status(200).json({
+            "message" : "No DB Connection",
+            "value" : psychographicProvider.getSchemaFields()
+        });
+    }
+};
+
 async function getPsychographics(req, res) {
     log.info("psychographic.js: getPsychographics");
     /**
@@ -122,6 +145,7 @@ module.exports = {
     checkFields : checkFields,
     checkParamsPsychographics : checkParamsPsychographics,
     checkParamsPsychographicsFixedLevel : checkParamsPsychographicsFixedLevel,
+    getPsychographicsSchemaFields : getPsychographicsSchemaFields,
     getPsychographics : getPsychographics,
     getPsychographicsFixedLevel : getPsychographicsFixedLevel,
     handle : handle

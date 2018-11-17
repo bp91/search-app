@@ -1,9 +1,14 @@
 const log4js = require('log4js');
 const log = log4js.getLogger("default");
+const dbEnv = require('../utils/EnvUtils').getDbEnv();
+const Field = require('../db/models').indexschemafield;
 const categories = require("../../index/categories.json");
 const CategoryProvider = require("../core/CategoryProvider").CategoryProvider;
 let categoryProvider = new CategoryProvider();
-
+let Sequelize;
+if(dbEnv == "true") {
+    Sequelize = require("./../db/models/index").Sequelize;
+}
 /**
  * This method controls if passed parameters are allowed in the enum schema defined
  * for the current index type
@@ -91,6 +96,24 @@ function checkParamsCategoriesFixedLevel(req, res, next) {
     }
 };
 
+function getCategorySchemaFields(req, res) {
+    if(dbEnv == "true") {
+        Field.findAll({
+            where : {
+                index_type : "category"
+            }
+        }).then(fields => {
+            return res.status(200).json(fields);
+        });
+    }else {
+        log.info("category.js: getCategorySchemaFields: No DB Connection");
+        return res.status(200).json({
+            "message" : "No DB Connection",
+            "value" : categoryProvider.getSchemaFields()
+        });
+    }
+};
+
 async function getCategories(req, res) {
     log.info("category.js: getCategories");
     /**
@@ -119,6 +142,7 @@ module.exports = {
     checkFields : checkFields,
     checkParamsCategories : checkParamsCategories,
     checkParamsCategoriesFixedLevel : checkParamsCategoriesFixedLevel,
+    getCategorySchemaFields : getCategorySchemaFields,
     getCategories : getCategories,
     getCategoriesFixedLevel : getCategoriesFixedLevel,
     handle : handle

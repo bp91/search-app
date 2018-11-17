@@ -3,7 +3,7 @@
     "database" : {
       "username": "postgres",
       "password": "postgres",
-      "database": "converter",
+      "database": "searchengine",
       "host": "localhost",
       "port": 5432,
       "dialect": "postgres"
@@ -14,7 +14,7 @@
     "database" : {
       "username": "postgres",
       "password": "postgres",
-      "database": "converter",
+      "database": "searchengine",
       "host": "10.48.0.3",
       "port": 5432,
       "dialect": "postgres"

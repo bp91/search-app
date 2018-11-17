@@ -37,6 +37,10 @@ CategoryProvider.prototype.checkField = function(field, value) {
     }
 };
 
+CategoryProvider.prototype.getSchemaFields = function() {
+    return fields;
+};
+
 CategoryProvider.prototype.getCategories = async function(params) {
     log.info("CategoryProvider.js: getCategories");
     try {

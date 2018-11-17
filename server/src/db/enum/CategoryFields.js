@@ -1,6 +1,6 @@
 const CategoryFields = {
     'children' : {
-        'value' : 'id',
+        'value' : 'children',
         'type' : 'object'
     },
     'fixedLevel' : {

@@ -11,7 +11,6 @@ var log4js = require('log4js');
 var log = log4js.getLogger("default");
 
 if (dbEnv == "true") {
-
   let sequelize;
   if (config.use_env_variable) {
     sequelize = new Sequelize(process.env[config.use_env_variable]);
