@@ -1,6 +1,9 @@
 const log4js = require('log4js');
 const log = log4js.getLogger("default");
-let BreakException = {};
+let BreakException = {
+    "status" : 404,
+    "value" : ""
+};
 
 function concatParams(sub, params, fields, operator) {
     let query = "";
@@ -34,12 +37,7 @@ function createQuery(sub, params, fields) {
                 return undefined;
         }
     }else {
-        if(Object.keys(params).length > 1) {
-            log.error("Wrong Parameters");
-            return undefined;
-        }else {
-            return concatParams(sub, params, fields, undefined);
-        }
+        return concatParams(sub, params, fields, undefined);
     }
 };
 
@@ -49,7 +47,6 @@ function findSublayer(fields, sub) {
         "value" : ""
     };
     for(var key in sub) {
-        console.log(fields[key].type);
         if(fields[key].type == "object") {
             returnValue.check = true;
             returnValue.value = key;
@@ -59,7 +56,7 @@ function findSublayer(fields, sub) {
 }
 
 async function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
-    log.info("SearchUtils.js: recursiveSearch with params: ", params, layer, resp, jumpLevel);
+    log.info("SearchUtils: recursiveSearch: with params: ", params, layer, resp, jumpLevel);
     if(resp == undefined) {
         resp = [];
     }
@@ -91,9 +88,6 @@ async function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
                         }
                     }
                 }else {
-                    resp.push({
-                        "value" : "Wrong Parameters"
-                    });
                     throw BreakException;
                 }
             }
@@ -103,14 +97,30 @@ async function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
             }
         });
         if(resp.length > 0) {
-            return resp[0].value;
+            return {
+                "status" : 200,
+                "value" : resp[0].value
+            };
         }else {
-            return resp;
+            return {
+                "status" : 200,
+                "value" : resp
+            };
         }
     }catch(e) {
-        log.error(e);
+        log.error("SearchUtils: recursiveSearch ", e);
         if(e === BreakException) {
-            return e["message"] = "Wrong Parameters";
+            return  {
+                "status" : 404,
+                "value" : {
+                    "message" : "Wrong Parameters"
+                }
+            };
+        }else {
+            return {
+                "status" : 404,
+                "value" : e
+            };
         }
     }
 };

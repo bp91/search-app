@@ -1,14 +1,14 @@
 const CategoryFields = {
-    'id': {
+    'children' : {
         'value' : 'id',
+        'type' : 'object'
+    },
+    'fixedLevel' : {
+        'value' : 'fixedLevel',
         'type' : 'int'
     },
-    'name': {
-        'value' : 'name',
-        'type' : 'string'
-    },
-    'level': {
-        'value' : 'level',
+    'id': {
+        'value' : 'id',
         'type' : 'int'
     },
     'l1': {
@@ -19,17 +19,29 @@ const CategoryFields = {
         'value' : 'l2',
         'type' : 'int'
     },
-    'children' : {
-        'value' : 'id',
-        'type' : 'object'
-    },
-    'fixedLevel' : {
-        'value' : 'fixedLevel',
+    'l3': {
+        'value' : 'l3',
         'type' : 'int'
     },
-    'children': {
-        'value' : 'children',
-        'type' : 'object'
+    'l4': {
+        'value' : 'l4',
+        'type' : 'int'
+    },
+    'level': {
+        'value' : 'level',
+        'type' : 'int'
+    },
+    'name': {
+        'value' : 'name',
+        'type' : 'string'
+    },
+    'pic': {
+        'value' : 'pic',
+        'type' : 'string'
+    },
+    'type': {
+        'value' : 'type',
+        'type' : 'string'
     },
     'operator' : ["AND", "OR"]
 };

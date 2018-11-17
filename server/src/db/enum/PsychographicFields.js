@@ -1,10 +1,18 @@
 const PsychographicFields = {
-    'values': {
-        'value' : 'values',
-        'type' : 'object'
+    'addonId': {
+        'value' : 'addonId',
+        'type' : 'string'
     },
-    'value': {
-        'value' : 'value',
+    'description': {
+        'value' : 'description',
+        'type' : 'string'
+    },
+    'fixedLevel' : {
+        'value' : 'fixedLevel',
+        'type' : 'int'
+    },
+    'ico': {
+        'value' : 'ico',
         'type' : 'string'
     },
     'id': {
@@ -19,21 +27,17 @@ const PsychographicFields = {
         'value' : 'pic',
         'type' : 'string'
     },
-    'ico': {
-        'value' : 'ico',
+    'sources': {
+        'value' : 'sources',
+        'type' : 'array'
+    },
+    'value': {
+        'value' : 'value',
         'type' : 'string'
     },
-    'description': {
-        'value' : 'description',
-        'type' : 'string'
-    },
-    'addonId': {
-        'value' : 'addonId',
-        'type' : 'string'
-    },
-    'fixedLevel' : {
-        'value' : 'fixedLevel',
-        'type' : 'int'
+    'values': {
+        'value' : 'values',
+        'type' : 'object'
     },
     'operator' : ['AND', 'OR']
 };

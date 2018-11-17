@@ -1,13 +1,16 @@
 const log4js = require('log4js');
 const log = log4js.getLogger("default");
 const fields = require("../db/enum/CategoryFields").CategoryFields;
-const QueryConstructor = require("../utils/QueryConstructor");
 const SearchUtils = require("../utils/SearchUtils");
 
 class CategoryProvider {
-    constructor(index) {
-        this.index = index;
+    constructor() {
+        this.index = undefined;
     }
+};
+
+CategoryProvider.prototype.setIndex = function(index) {
+    this.index = index;
 };
 
 CategoryProvider.prototype.checkField = function(field, value) {
@@ -36,26 +39,20 @@ CategoryProvider.prototype.checkField = function(field, value) {
 
 CategoryProvider.prototype.getCategories = async function(params) {
     log.info("CategoryProvider.js: getCategories");
-    if(!params.fixedLevel) {
-        try {
-            delete params.fixedLevel;
-            response = await SearchUtils.recursiveSearch(this.index, fields, params);
-            return  {
-                "status" : 200,
-                "message" : response
-            }
-        }catch(e) {
-            log.error(e);
-            return {
-                "status" : 404,
-                "message" : e
-            };
+    try {
+        response = await SearchUtils.recursiveSearch(this.index, fields, params);
+        return  {
+            "status" : response.status,
+            "message" : response.value
         }
-    }else {
+    }catch(e) {
+        log.error(e);
         return {
             "status" : 404,
-            "message" : "Wrong Parameters"
-        }
+            "message" : {
+                "message" : e
+            }
+        };
     }
 };
 
@@ -66,13 +63,15 @@ CategoryProvider.prototype.getCategoriesFromLayer = async function(params) {
         response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
         return  {
             "status" : 200,
-            "message" : response
+            "message" : response.value
         }
     }catch(e) {
         log.error(e);
         return {
             "status" : 404,
-            "message" : e
+            "message" : {
+                "message" : e
+            }
         };
     }
 };

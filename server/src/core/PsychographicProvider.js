@@ -4,9 +4,13 @@ const fields = require("../db/enum/PsychographicFields").PsychographicFields;
 const SearchUtils = require("../utils/SearchUtils");
 
 class PsychographicProvider {
-    constructor(index) {
-        this.index = index;
+    constructor() {
+        this.index = undefined;
     }
+};
+
+PsychographicProvider.prototype.setIndex = function(index) {
+    this.index = index;
 };
 
 PsychographicProvider.prototype.checkField = function(field, value) {
@@ -46,13 +50,17 @@ PsychographicProvider.prototype.getPsychographics = async function(params) {
             log.error(e);
             return {
                 "status" : 404,
-                "message" : e
+                "message" : {
+                    "message" : e
+                }
             };
         }
     }else {
         return {
             "status" : 404,
-            "message" : "Wrong Parameters"
+            "message" : {
+                "message" : "Wrong Parameters"
+            }
         }
     }
 };
@@ -62,10 +70,12 @@ PsychographicProvider.prototype.getPsychographicsFromLayer = async function(para
         const jumpLevel = params.fixedLevel;
         delete params.fixedLevel;
         response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
-        return  {
-            "status" : 200,
-            "message" : response
-        }
+        return {
+            "status" : 404,
+            "message" : {
+                "message" : e
+            }
+        };
     }catch(e) {
         log.error(e);
         return {
