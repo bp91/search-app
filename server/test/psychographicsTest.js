@@ -1,4 +1,4 @@
-let psychographicController = require('../src/controllers/psychographics');
+let psychographicController = require('../src/controllers/tree');
 let http_mocks = require('node-mocks-http');
 let assert = require('assert');
 
@@ -11,7 +11,10 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "customField" : "Lifestyles",
             }
@@ -30,35 +33,14 @@ describe('psychographic test', function() {
         });
     });
 
-    it("Unhandled Parameters", async function() {
-        var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
-        var request = http_mocks.createRequest({
-            method: 'GET',
-            url: '/psychographics',
-            query : {
-                "label" : "Lifestyles",
-                "fixedLevel" : 3
-            }
-        });
-
-        response.on("end", function() {
-            assert.equal(response._getData(), JSON.stringify({
-                "message": "Wrong Parameters"
-                }));
-        });
-        
-        await psychographicController.checkParamsPsychographics(request, response);
-
-        psychographicController.handle(request, response, function() {
-            done();
-        });
-    });
-
     it("operator without all fields", async function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "operator" : "and"
@@ -71,7 +53,7 @@ describe('psychographic test', function() {
                 }));
         });
         
-        await psychographicController.checkParamsPsychographics(request, response);
+        await psychographicController.checkParams(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -82,10 +64,14 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
-                "operator" : "and"
+                "operator" : "and",
+                "fixedLevel" : 3
             }
         });
 
@@ -95,7 +81,7 @@ describe('psychographic test', function() {
                 }));
         });
         
-        await psychographicController.checkParamsPsychographics(request, response);
+        await psychographicController.checkParams(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -106,7 +92,10 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "operator" : "and"
@@ -261,7 +250,7 @@ describe('psychographic test', function() {
                 ]));
         });
         
-        await psychographicController.getPsychographics(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -272,7 +261,10 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy",
@@ -428,7 +420,7 @@ describe('psychographic test', function() {
                 ]));
         });
         
-        await psychographicController.getPsychographics(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -439,7 +431,7 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element/psychographics',
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy"
@@ -452,7 +444,7 @@ describe('psychographic test', function() {
                 }));
         });
         
-        await psychographicController.checkParamsPsychographics(request, response);
+        await psychographicController.checkParams(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -463,7 +455,10 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy",
@@ -477,7 +472,7 @@ describe('psychographic test', function() {
                 }));
         });
         
-        await psychographicController.checkParamsPsychographics(request, response);
+        await psychographicController.checkParams(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -488,7 +483,10 @@ describe('psychographic test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/psychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "testFake",
@@ -500,7 +498,7 @@ describe('psychographic test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await psychographicController.getPsychographics(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -513,7 +511,10 @@ describe('psychographicsFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "customField" : "Lifestyles",
             }
@@ -532,34 +533,14 @@ describe('psychographicsFixedLevel test', function() {
         });
     });
 
-    it("Missing Parameter fixedLevel", async function() {
-        var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
-        var request = http_mocks.createRequest({
-            method: 'GET',
-            url: '/fixedPsychographics',
-            query : {
-                "label" : "Lifestyles"
-            }
-        });
-
-        response.on("end", function() {
-            assert.equal(response._getData(), JSON.stringify({
-                "message": "Wrong Parameters"
-                }));
-        });
-        
-        await psychographicController.checkParamsPsychographicsFixedLevel(request, response);
-
-        psychographicController.handle(request, response, function() {
-            done();
-        });
-    });
-
     it("Label Lifestyles", async function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "fixedLevel" : 2
@@ -714,7 +695,7 @@ describe('psychographicsFixedLevel test', function() {
                 ]));
         });
         
-        await psychographicController.getPsychographicsFixedLevel(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -725,7 +706,10 @@ describe('psychographicsFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy",
@@ -739,7 +723,7 @@ describe('psychographicsFixedLevel test', function() {
                 }));
         });
         
-        await psychographicController.checkParamsPsychographicsFixedLevel(request, response);
+        await psychographicController.checkParams(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -750,7 +734,10 @@ describe('psychographicsFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy",
@@ -907,7 +894,7 @@ describe('psychographicsFixedLevel test', function() {
                 ]));
         });
         
-        await psychographicController.getPsychographicsFixedLevel(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -918,7 +905,10 @@ describe('psychographicsFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "fixedLevel" : 3
@@ -929,7 +919,7 @@ describe('psychographicsFixedLevel test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await psychographicController.getPsychographicsFixedLevel(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();
@@ -940,7 +930,10 @@ describe('psychographicsFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedPsychographics',
+            url: '/element',
+            params:{
+                "tree" : "psychographics"
+            },
             query : {
                 "label" : "Lifestyles",
                 "id" : "lifestyiles-cy",
@@ -953,7 +946,7 @@ describe('psychographicsFixedLevel test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await psychographicController.getPsychographicsFixedLevel(request, response);
+        await psychographicController.getElement(request, response);
 
         psychographicController.handle(request, response, function() {
             done();

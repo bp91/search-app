@@ -356,7 +356,7 @@
                     }
                 }
                 parameters = this.createJSON();
-                axios.get(config.url + ":" + config.port + "/" + this.getQuery(),{
+                axios.get(config.url + ":" + config.port + "/element/" + this.selectedIndex,{
                 params : parameters
                 }).then(response => {
                     this.results.length = 0;
@@ -479,6 +479,10 @@
     };
 </script>
 <style>
+    .resultContainer {
+        margin-top: 20px;
+    }
+    
     .operator select {
         margin-left: -32px;
     }

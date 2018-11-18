@@ -1,4 +1,4 @@
-let categoryController = require('../src/controllers/category');
+let categoryController = require('../src/controllers/tree');
 let http_mocks = require('node-mocks-http');
 let assert = require('assert');
 
@@ -11,7 +11,7 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element/categories',
             query : {
                 "customField" : "Punk",
             }
@@ -34,7 +34,7 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element/categories',
             query : {
                 "name" : "Punk",
                 "fixedLevel" : 3
@@ -47,7 +47,7 @@ describe('categories test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategories(request, response);
+        await categoryController.checkFields(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -58,7 +58,7 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element/categories',
             query : {
                 "name" : "Punk",
                 "operator" : "and"
@@ -71,7 +71,7 @@ describe('categories test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategories(request, response);
+        await categoryController.checkParams(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -82,7 +82,7 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element/categories',
             query : {
                 "name" : "Punk",
                 "operator" : "and"
@@ -95,7 +95,7 @@ describe('categories test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategories(request, response);
+        await categoryController.checkParams(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -106,7 +106,10 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
             }
@@ -122,7 +125,7 @@ describe('categories test', function() {
                 }]));
         });
         
-        await categoryController.getCategories(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -133,7 +136,10 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level" : 3,
@@ -151,7 +157,7 @@ describe('categories test', function() {
                 }]));
         });
         
-        await categoryController.getCategories(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -162,7 +168,7 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element/categories',
             query : {
                 "name" : "Punk",
                 "level" : 3
@@ -175,7 +181,7 @@ describe('categories test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategories(request, response);
+        await categoryController.checkParams(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -186,7 +192,10 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level" : 3,
@@ -200,7 +209,7 @@ describe('categories test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategories(request, response);
+        await categoryController.checkParams(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -211,7 +220,10 @@ describe('categories test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/categories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level" : 2,
@@ -223,7 +235,7 @@ describe('categories test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await categoryController.getCategories(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -236,7 +248,10 @@ describe('categoriesFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "customField" : "Punk",
             }
@@ -255,34 +270,14 @@ describe('categoriesFixedLevel test', function() {
         });
     });
 
-    it("Missing Parameter fixedLevel", async function() {
-        var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
-        var request = http_mocks.createRequest({
-            method: 'GET',
-            url: '/fixedCategories',
-            query : {
-                "name" : "Punk"
-            }
-        });
-
-        response.on("end", function() {
-            assert.equal(response._getData(), JSON.stringify({
-                "message": "Wrong Parameters"
-                }));
-        });
-        
-        await categoryController.checkParamsCategoriesFixedLevel(request, response);
-
-        categoryController.handle(request, response, function() {
-            done();
-        });
-    });
-
     it("Category Punk", async function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "fixedLevel" : 3
@@ -299,7 +294,7 @@ describe('categoriesFixedLevel test', function() {
                 }]));
         });
         
-        await categoryController.getCategoriesFixedLevel(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -310,7 +305,10 @@ describe('categoriesFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level": 3,
@@ -324,7 +322,7 @@ describe('categoriesFixedLevel test', function() {
                 }));
         });
         
-        await categoryController.checkParamsCategoriesFixedLevel(request, response);
+        await categoryController.checkParams(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -335,7 +333,10 @@ describe('categoriesFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level": 3,
@@ -354,7 +355,7 @@ describe('categoriesFixedLevel test', function() {
                 }]));
         });
         
-        await categoryController.getCategoriesFixedLevel(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -365,7 +366,10 @@ describe('categoriesFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "fixedLevel": 2
@@ -376,7 +380,7 @@ describe('categoriesFixedLevel test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await categoryController.getCategoriesFixedLevel(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();
@@ -387,7 +391,10 @@ describe('categoriesFixedLevel test', function() {
         var response = http_mocks.createResponse({eventEmitter: require('events').EventEmitter});
         var request = http_mocks.createRequest({
             method: 'GET',
-            url: '/fixedCategories',
+            url: '/element',
+            params:{
+                "tree" : "categories"
+            },
             query : {
                 "name" : "Punk",
                 "level" : 3,
@@ -400,7 +407,7 @@ describe('categoriesFixedLevel test', function() {
             assert.equal(response._getData(), JSON.stringify([]));
         });
         
-        await categoryController.getCategoriesFixedLevel(request, response);
+        await categoryController.getElement(request, response);
 
         categoryController.handle(request, response, function() {
             done();

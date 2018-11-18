@@ -14,58 +14,44 @@ If you have a database connection (as described into the server/config/config.js
 
 By default, the db variable is setted to false.
 
-The application responds to the following HTTP GET requests:
-* `/categories`, Query string params accepted:
-    * name (ex: Punk)
-    * id (ex: 1)
-    * level (ex: 2)
-    * l1 (ex: -1)
-    * l2 (ex: 3)
-    * l3 (ex: -3)
-    * l4 (ex: -2)
-    * pic (ex: /assets/img/categories/category_343.jpg)
-    * type (ex: audience)
-* `/psychographics`, Query string params accepted:
-    * label (ex: Advertising)
-    * id (ex: Adv Strategy)
-    * pic (ex: /assets/img/psychographics/ico/psy_6.jpg)
-    * value (ex: Ads EmergingMediaVehicles)
-    * description(ex: This group responds...)
-    * ico (ex: abc)
-    * addonId (ex: cy)
-* `/fixedCategories`, In order to search in a certain level. Query string params accepted:
-    * fixedLevel (ex: 2) MANDATORY
-    * name (ex: Punk)
-    * id (ex: 1)
-    * level (ex: 2)
-    * l1 (ex: -1)
-    * l2 (ex: 3)
-    * l3 (ex: -3)
-    * l4 (ex: -2)
-    * pic (ex: /assets/img/categories/category_343.jpg)
-    * type (ex: audience)
-* `/fixedPsychographics`, In order to search in a certain level. Query string params accepted:
-    * fixedLevel (ex: 2) MANDATORY
-    * label (ex: Advertising)
-    * id (ex: Adv Strategy)
-    * pic (ex: /assets/img/psychographics/ico/psy_6.jpg)
-    * value (ex: Ads EmergingMediaVehicles)
-    * description(ex: This group responds...)
-    * ico (ex: abc)
-    * addonId (ex: cy)
+The application responds to the following HTTP GET request:
+* `/element:tree`, with the following params for tree:
+    * `categories` in order to explore `categories.json` tree
+    * `psychographics` in order to explore `psychographics.json` tree.
+Query string parameters accepted:
+    * for `categories`:
+        * name (ex: Punk)
+        * id (ex: 1)
+        * level (ex: 2)
+        * l1 (ex: -1)
+        * l2 (ex: 3)
+        * l3 (ex: -3)
+        * l4 (ex: -2)
+        * pic (ex: /assets/img/categories/category_343.jpg)
+        * type (ex: audience)
+        * fixedLevel (ex: 2) MANDATORY if you want to explore only a certain level of the tree
+    * for `psychographics`:
+        * label (ex: Advertising)
+        * id (ex: Adv Strategy)
+        * pic (ex: /assets/img/psychographics/ico/psy_6.jpg)
+        * value (ex: Ads EmergingMediaVehicles)
+        * description(ex: This group responds...)
+        * ico (ex: abc)
+        * addonId (ex: cy)
+        * fixedLevel (ex: 2) MANDATORY if you want to explore only a certain level of the tree
 
 Call examples:
-* `http://localhost:8081/categories?name=Punk`
-* `http://localhost:8081/psychographics?label=Advertising`
-* `http://localhost:8081/fixedCategories?name=Punk&fixedLevel=2`
-* `http://localhost:8081/fixedPsychographics?label=Advertising&fixedLevel=3`
+* `http://localhost:8081/element/categories?name=Punk`
+* `http://localhost:8081/element/psychographics?label=Advertising`
+* `http://localhost:8081/element/categories?name=Punk&fixedLevel=2`
+* `http://localhost:8081/element/psychographics?label=Advertising&fixedLevel=3`
 
 It's also possible to execute more complete queries, by passing field operator (MANDATORY field) and another accepted field
 
-* `http://localhost:8081/categories?name=Punk&id=25&operator=and`
-* `http://localhost:8081/psychographics?label=Advertising&id=Adv+Strategy&operator=and`
-* `http://localhost:8081/fixedCategories?name=Punk&id=25&operator=and&fixedLevel=2`
-* `http://localhost:8081/fixedPsychographics?label=Advertising&id=Adv+Strategy&fixedLevel=3&operator=and`
+* `http://localhost:8081/element/categories?name=Punk&id=25&operator=and`
+* `http://localhost:8081/element/psychographics?label=Advertising&id=Adv+Strategy&operator=and`
+* `http://localhost:8081/element/categories?name=Punk&id=25&operator=and&fixedLevel=2`
+* `http://localhost:8081/element/psychographics?label=Advertising&id=Adv+Strategy&fixedLevel=3&operator=and`
 
 ## test
 
@@ -82,7 +68,7 @@ Into the frontend directory:
 
 ## Development:
 
-* server: `npm start` ->  `localhost:8081/categories?name=Punk` || `localhost:8081/psychographics?label=Advertising`
+* server: `npm start` ->  `localhost:8081/element/categories?name=Punk` || `localhost:8081/element/psychographics?label=Advertising`
 * frontend: `npm run serve` -> `localhost:8080`
 
 ## Development with postgresql container running:
