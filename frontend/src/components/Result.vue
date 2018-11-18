@@ -59,6 +59,14 @@
                 </div>
             </div>
             <div class="col-xs-8 results">
+                <div class="resultsBox" v-for="(document, index) in results" :key="index">
+                    <div v-if="selectedIndex == 'categories'">
+                        <document-category></document-category>
+                    </div>
+                    <div v-if="selectedIndex == 'psychographics'">
+                        <document-psychographic></document-psychographic>
+                    </div>
+                </div>
             </div>
             <div class="col-xs-2">
             </div>
@@ -68,6 +76,9 @@
 <script>
     import axios from 'axios';
     import jsonArray from 'json-array-split';
+    import DocumentCategory from'@/components/DocumentCategory.vue';
+    import DocumentPsychographic from'@/components/DocumentPsychographic.vue';
+
     const env = process.env.NODE_ENV || 'development';
     const config = require("../../config/config.json").server[env];
     export default {
@@ -86,6 +97,7 @@
                         "value" : "psychographics"
                     }
                 ],
+                results : [],
                 operators : ["AND", "OR"],
                 selectedIndex : "categories",
                 activeFilters : {},
@@ -93,12 +105,16 @@
                 psychographicsFilters : []
             }
         },
+        components : {
+            DocumentCategory,
+            DocumentPsychographic
+        },
         mounted() {
             this.searchInput = this.$store.state.searchInput != undefined ? this.$store.state.searchInput : "";
             this.indices = this.$store.state.indices != undefined ? this.$store.state.indices : this.indices;
             this.selectedIndex = this.$store.state.selectedIndex != undefined? this.$store.state.selectedIndex : "";
             this.activeFilters = this.$store.state.activeFilters != undefined? this.$store.state.activeFilters : {};
-            
+            this.results = this.$store.state.results != undefined? this.$store.state.results : [];
             if(this.searchInput != "") {
                 this.activeFilters["name"] = this.searchInput;
             }
@@ -109,13 +125,24 @@
                 this.getPsychographicsSchema();
             }
         },
+        watch : {
+            "searchInput" : function(newValue) {
+                if(newValue != "") {
+                    this.disableSend = false;
+                }else {
+                    this.disableSend = true;
+                }
+            }
+        },
         methods: {
             getCategoriesSchema() {
                 axios.get(config.url + ":" + config.port + "/categoriesSchemaFields"
                 ).then(response => {
                     if(response.data.hasOwnProperty("message")) {
                         for(var key in response.data.value) {
-                            this.categoriesFilters.push(response.data.value[key]);
+                            let obj = response.data.value[key];
+                            obj["name"] = key;
+                            this.categoriesFilters.push(obj);
                         }
                     }else {
                         this.categoriesFilters = response.data;
@@ -141,7 +168,9 @@
                 ).then(response => {
                     if(response.data.hasOwnProperty("message")) {
                         for(var key in response.data.value) {
-                            this.psychographicsFilters.push(response.data.value[key]);
+                            let obj = response.data.value[key];
+                            obj["name"] = key;
+                            this.psychographicsFilters.push(obj);
                         }
                     }else {
                         this.psychographicsFilters = response.data;
@@ -162,6 +191,49 @@
                         this.errorMessage = error;
                     }
                 });
+            },
+            checkParameters() {
+                let me = this;
+                if(this.searchInput != "" && this.selectedIndex != "") {
+                    let foundIndex = false;
+                    this.indices.forEach(function(index) {
+                        if(index.value == me.selectedIndex) {
+                            foundIndex = true;
+                        }
+                    });
+                    return foundIndex;
+                }else {
+                    return false;
+                }
+            },
+            sendRequest() {
+                if(this.checkParameters()) {
+                    axios.get(config.url + ":" + config.port + "/" + this.selectedIndex,{
+                    params : {
+                        name : this.searchInput
+                    }
+                    }).then(response => {
+                        this.$store.state.results = response.data;
+                        this.$store.state.searchInput = this.searchInput;
+                        this.$store.state.indices = this.indices;
+                        this.$store.state.selectedIndex = this.selectedIndex;
+                        this.results = response.data;
+                    }).catch(error => {
+                        if(error.hasOwnProperty("response")) {
+                            if(error.response.hasOwnProperty("data")) {
+                                if(error.response.data.hasOwnProperty("message")) {
+                                    this.errorMessage = error.response.data.message;
+                                }else {
+                                    this.errorMessage = error.response.data;
+                                }
+                            }else {
+                                this.errorMessage = error.response;
+                            }
+                        }else {
+                            this.errorMessage = error;
+                        }
+                    });
+                }
             }
         }
     };

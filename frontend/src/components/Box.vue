@@ -91,7 +91,7 @@
                         name : this.searchInput
                     }
                     }).then(response => {
-                        this.$store.results = response;
+                        this.$store.state.results = response.data;
                         this.$store.state.searchInput = this.searchInput;
                         this.$store.state.indices = this.indices;
                         this.$store.state.selectedIndex = this.selectedIndex;
