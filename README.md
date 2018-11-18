@@ -14,22 +14,60 @@ If you have a database connection (as described into the server/config/config.js
 
 By default, the db variable is setted to false.
 
-The application responds to the HTTP GET request '/category'.
-Query string params accepted:
-
-* name (ex: Punk)
-* id (ex: 1)
-* level (ex: 2)
-* l1 (ex: -1)
-* l2 (ex: 3)
-* operator (ex: AND)
+The application responds to the following HTTP GET requests:
+* '/category', Query string params accepted:
+    * name (ex: Punk)
+    * id (ex: 1)
+    * level (ex: 2)
+    * l1 (ex: -1)
+    * l2 (ex: 3)
+    * l3 (ex: -3)
+    * l4 (ex: -2)
+    * pic (ex: /assets/img/categories/category_343.jpg)
+    * type (ex: audience)
+* '/psychographics', Query string params accepted:
+    * label (ex: Advertising)
+    * id (ex: Adv Strategy)
+    * pic (ex: /assets/img/psychographics/ico/psy_6.jpg)
+    * value (ex: Ads EmergingMediaVehicles)
+    * description(ex: This group responds...)
+    * ico (ex: abc)
+    * addonId (ex: cy)
+* '\fixedCategories', In order to search in a certain level. Query string params accepted:
+    * fixedLevel (ex: 2) MANDATORY
+    * name (ex: Punk)
+    * id (ex: 1)
+    * level (ex: 2)
+    * l1 (ex: -1)
+    * l2 (ex: 3)
+    * l3 (ex: -3)
+    * l4 (ex: -2)
+    * pic (ex: /assets/img/categories/category_343.jpg)
+    * type (ex: audience)
+* '\fixedPsychographics', In order to search in a certain level. Query string params accepted:
+    * fixedLevel (ex: 2) MANDATORY
+    * label (ex: Advertising)
+    * id (ex: Adv Strategy)
+    * pic (ex: /assets/img/psychographics/ico/psy_6.jpg)
+    * value (ex: Ads EmergingMediaVehicles)
+    * description(ex: This group responds...)
+    * ico (ex: abc)
+    * addonId (ex: cy)
 
 Call examples:
 * http://localhost:8081/category?name=Punk
+* http://localhost:8081/psychographics?label=Advertising
+* http://localhost:8081/fixedCategories?name=Punk&fixedLevel=2
+* http://localhost:8081/fixedPsychographics?label=Advertising&fixedLevel=3
 
-It's also possible to execute more complete queries, by passing field operator and another accepter field
+It's also possible to execute more complete queries, by passing field operator (MANDATORY field) and another accepted field
 
-* http://localhost:8081/category?name=Punk&id=25&operator=AND
+* http://localhost:8081/category?name=Punk&id=25&operator=and
+* http://localhost:8081/psychographics?label=Advertising&id=Adv+Strategy
+&operator=and
+* http://localhost:8081/fixedCategories?name=Punk&id=25&operator=and&fixedLevel=2
+* http://localhost:8081/fixedPsychographics?label=Advertising&id=Adv+Strategy&fixedLevel=3
+&operator=and
 
 ## test
 

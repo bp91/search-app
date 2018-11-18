@@ -50,17 +50,17 @@ services:
             default:
                 ipv4_address: 10.48.0.4
 
-    # frontend:
-    #     build: frontend
-    #     container_name: frontend
-    #     restart: always
-    #     ports:
-    #         - "8080:8080"
-    #     volumes:
-    #         - ./frontend/config:/usr/src/app/config
-    #     depends_on: 
-    #         - server
-    #     networks: 
-    #         default:
-    #             ipv4_address: 10.48.0.5
+    frontend:
+        build: frontend
+        container_name: frontend
+        restart: always
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./frontend/config:/usr/src/app/config
+        depends_on: 
+            - server
+        networks: 
+            default:
+                ipv4_address: 10.48.0.5
 version: '2'

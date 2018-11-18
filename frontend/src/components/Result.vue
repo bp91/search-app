@@ -158,24 +158,22 @@
             this.results = this.$store.state.results != undefined? this.$store.state.results : [];
             if(this.searchInput != "") {
                 if(this.selectedIndex == "categories") {
-                    let me = this;
                     let noRepetition = this.activeFilters.filter(function(f) {
                         if(Object.keys(f)[0] == "name") {
-                            return f["name"] == me.searchInput
+                            return f["name"] == this.searchInput
                         }
-                    });
+                    }.bind(this));
                     if(noRepetition.length == 0) {
                         this.activeFilters.push({
                             "name" : this.searchInput
                         });
                     }
                 }else {
-                    let me = this;
                     let noRepetition = this.activeFilters.filter(function(f) {
                         if(Object.keys(f)[0] == "label") {
-                            return f["label"] == me.searchInput
+                            return f["label"] == this.searchInput
                         }
-                    });
+                    }.bind(this));
                     if(noRepetition.length == 0) {
                         this.activeFilters.push({
                             "label" : this.searchInput
@@ -202,7 +200,6 @@
                 if(newValue != oldValue) {
                     this.filterName = "None";
                     this.filterValue = "";
-                    let me = this;
                     this.activeFilters = [];
                     this.results = [];
                     this.$store.state.selectedIndex = newValue;
@@ -232,7 +229,11 @@
                             }
                         }
                     }else {
-                        this.categoriesFilters = response.data;
+                        response.data.forEach(function(f) {
+                            if((f.type == "string" || f.type == "int") && f.value != "name") {
+                                this.categoriesFilters.push(f);
+                            }
+                        }.bind(this));
                     }
                 }).catch(error => {
                     if(error.hasOwnProperty("response")) {
@@ -264,7 +265,11 @@
                             }
                         }
                     }else {
-                        this.psychographicsFilters = response.data;
+                        response.data.forEach(function(f) {
+                            if((f.type == "string" || f.type == "int") && f.value != "label") {
+                                this.psychographicsFilters.push(f);
+                            }
+                        }.bind(this));
                     }
                     
                 }).catch(error => {
@@ -284,13 +289,12 @@
                 });
             },
             checkParameters() {
-                let me = this;
                 let foundIndex = false;
                 this.indices.forEach(function(index) {
-                    if(index.value == me.selectedIndex) {
+                    if(index.value == this.selectedIndex) {
                         foundIndex = true;
                     }
-                });
+                }.bind(this));
                 return foundIndex;
             },
             refreshNameOrLabel() {
@@ -305,10 +309,9 @@
                     }
                     i += 1;
                 });
-                let me = this;
                 indicesToRemove.forEach(function(index) {
-                    me.activeFilters.splice(index, 1);
-                });
+                    this.activeFilters.splice(index, 1);
+                }.bind(this));
             },
             createJSON() {
                 let json = {};
@@ -328,26 +331,23 @@
             },
             getQuery() {
                 let selectedQuery = "";
-                let me = this;
                 this.queries.forEach(function(query) {
-                    if(query.isFixed == me.isFixed && query.selectedIndex == me.selectedIndex) {
+                    if(query.isFixed == this.isFixed && query.selectedIndex == this.selectedIndex) {
                         selectedQuery = query.query;
                     }
-                });
+                }.bind(this));
                 return selectedQuery;
             },
             sendRequest() {
                 let parameters;
                 this.refreshNameOrLabel();
                 if(this.selectedIndex == "categories") {
-                    let me = this;
                     if(this.searchInput != "") {
                         this.activeFilters.push({
                             "name" : this.searchInput
                         });
                     }
                 }else {
-                    let me = this;
                     if(this.searchInput != "") {
                         this.activeFilters.push({
                             "label" : this.searchInput
@@ -388,10 +388,9 @@
                 }
             },
             checkNoRepetitionInFilters(value) {
-                let me = this;
                 let noRepetition = this.activeFilters.filter(function(f) {
                     return Object.keys(f)[0] == value;
-                });
+                }.bind(this));
                 if(noRepetition.length == 0) {
                     return true;
                 }else {
@@ -445,16 +444,15 @@
                         this.addFilter();
                     }
 				}else {
-                    let me = this;
                     let typeFilter = "";
                     if(this.selectedIndex == "categories") {
                         typeFilter = this.categoriesFilters.filter(function(f) {
-                            return f.value == me.filterName;
-                        });
+                            return f.value == this.filterName;
+                        }.bind(this));
                     }else {
                         typeFilter = this.psychographicsFilters.filter(function(f) {
-                            return f.value == me.filterName;
-                        });
+                            return f.value == this.filterName;
+                        }.bind(this));
                     }
                     if(typeFilter[0].type == "int") {
                         if ((charCode > 31 && (charCode < 48 || (charCode > 57 && charCode != 189))) && charCode !== 46) {
