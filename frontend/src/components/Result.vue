@@ -35,26 +35,36 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-xs-2 filters">
+            <div class="col-xs-4 filters">
                 <div class="row operator">
-                    <div class="col-xs-12">
+                    <div class="col-xs-6">
                         <select>
                             <option v-for="operator in operators" :key="operator">{{operator}}</option>
                         </select>
                     </div>
+                    <div class="col-xs-6">
+                    </div>
                 </div>
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div v-if="selectedIndex == 'categories'" class="categoriesFilters">
-                            <select>
-                                <option v-for="category in categoriesFilters" :key="category.value">{{category.value}}</option>
-                            </select>
-                        </div>
-                        <div v-if="selectedIndex == 'psychographics'" class="psychographicsFilters">
-                            <select>
-                                <option v-for="psychographic in psychographicsFilters" :key="psychographic.value">{{psychographic.value}}</option>
-                            </select>
-                        </div>
+                <div class="row" v-if="selectedIndex == 'categories'">
+                    <div class="col-xs-6">
+                        <select v-model="filterName">
+                            <option>None</option>
+                            <option v-for="category in categoriesFilters" :key="category.value">{{category.value}}</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-6 categoryFilterValue" v-if="checkFilterNone()">
+                        <input type="text" v-model="filterValue"/>
+                    </div>
+                </div>
+                <div class="row" v-if="selectedIndex == 'psychographics'">
+                    <div class="col-xs-6">
+                        <select v-model="filterName">
+                            <option>None</option>
+                            <option v-for="psychographic in psychographicsFilters" :key="psychographic.value">{{psychographic.value}}</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-6 categoryPsychographicValue" v-if="checkFilterNone()">
+                        <input type="text" v-model="filterValue"/>
                     </div>
                 </div>
             </div>
@@ -101,6 +111,8 @@
                 operators : ["AND", "OR"],
                 selectedIndex : "categories",
                 activeFilters : {},
+                filterName : "None",
+                filterValue : "",
                 categoriesFilters : [],
                 psychographicsFilters : []
             }
@@ -131,6 +143,12 @@
                     this.disableSend = false;
                 }else {
                     this.disableSend = true;
+                }
+            },
+            "selectedIndex" : function(newValue, oldValue) {
+                if(newValue != oldValue) {
+                    this.filterName = "None";
+                    this.filterValue = "";
                 }
             }
         },
@@ -234,6 +252,27 @@
                         }
                     });
                 }
+            },
+            changedFilter(event) {
+                let oldFilter = "";
+                for(var key in this.activeFilters) {
+                    if(key != "name" && key != "label" && key != "fixedLevel") {
+                        oldFilter = key;
+                        break;
+                    }
+                }
+                delete this.activeFilters[oldFilter];
+                this.activeFilters.push({
+                    "name" : event.target.value,
+                    "value" : ""
+                })
+            },
+            checkFilterNone() {
+                if(this.filterName != "None") {
+                    return true;
+                }else {
+                    return false;
+                }
             }
         }
     };
@@ -278,6 +317,21 @@
 
     .buttonDisabled {
         background-color: #88e88c;
+    }
+    .categoryFilterValue input,
+    .categoryPsychographicValue input {
+        padding: 0px 0px;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+    .categoryFilterValue {
+        margin-left: -70px;
+    }
+    .categoryPsychographicValue {
+       margin-left: -70px; 
     }
 </style>
 

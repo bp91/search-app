@@ -2,8 +2,6 @@
     <div class="documentContainer">
         <div class="row"></div>
         <div class="row rowDocument" v-for="document in documents" :key="document.name">
-            <div class="col-xs-3">
-            </div>
             <div class="col-xs-6">
                 <div class="row element" v-if="checkChild(document)">
                     <document-category></document-category>
@@ -30,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xs-3">
+            <div class="col-xs-6">
             </div>
         </div>
     </div>
@@ -48,7 +46,6 @@ export default {
     },
     mounted() {
         this.documents = this.$store.state.results != undefined? this.$store.state.results : [];
-        console.log(this.documents);
     },
     methods: {
         documentKeys(document) {
