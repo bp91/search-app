@@ -72,9 +72,11 @@
                 <div class="row">
                     <div class="col-xs-12 activeFilters">
                         <div class="activeFilter" v-for="(filter, index) in activeFilters" :key="getFilterKey(filter)">
-                            <label>
-                                {{getFilterKey(filter)}} : {{getFilterValue(filter, getFilterKey(filter))}}
-                            </label>
+                            <div class="labelContainer">
+                                <label>
+                                    {{getFilterKey(filter)}} : {{getFilterValue(filter, getFilterKey(filter))}}
+                                </label>
+                            </div>
                             <i class="fa fa-times" @click="removeFilter(index)"></i>
                         </div>
                     </div>
@@ -301,7 +303,6 @@
                 let indicesToRemove = [];
                 var i = 0;
                 this.activeFilters.forEach(function(f) {
-                    console.log(f);
                     for(var key in f) {
                         if(key == "name" || key == "label") {
                             indicesToRemove.push(i);
@@ -398,7 +399,6 @@
                 }
             },
             removeFilter(index) {
-                console.log(this.activeFilters[index]);
                 if(Object.keys(this.activeFilters[index])[0] == "fixedLevel") {
                     this.isFixed = false;
                 }
@@ -555,12 +555,20 @@
     }
 
     .activeFilter {
-        width: 120px;
+        width: 140px;
         border: 1px solid;
         border-radius: 4px;
         margin: 4px 5px;
         background: #45a049;
         color: white;
+        display: inline-flex;
+    }
+    
+    .activeFilter label {
+        max-width: 100px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .activeFilters {
@@ -571,7 +579,8 @@
 
     .activeFilter i {
         cursor: pointer;
-        margin-left: 6px;
+        margin-left: 20px;
+        margin-top: 2px;
     }
 
     .resultsAndFilter {
