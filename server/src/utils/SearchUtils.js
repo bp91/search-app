@@ -5,6 +5,9 @@ let BreakException = {
     "value" : ""
 };
 
+/**
+ * Dynamically creation of the string to be evaluated
+ */
 function concatParams(sub, params, fields, operator) {
     let query = "";
     for(var key in params) {
@@ -57,6 +60,9 @@ function createQuery(sub, params, fields) {
     }
 };
 
+/**
+ * For the defined schemas, all the sublayers are identified by a type object
+ */
 function findSublayer(fields, sub) {
     let returnValue = {
         "check" : false,
@@ -69,8 +75,11 @@ function findSublayer(fields, sub) {
         }
     }
     return returnValue;
-}
+};
 
+/**
+ * Recursive method in order to deep search if it's necessary
+ */
 async function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
     log.info("SearchUtils: recursiveSearch: with params: ", params, layer, resp, jumpLevel);
     if(resp == undefined) {

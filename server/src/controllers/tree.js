@@ -126,13 +126,14 @@ function checkParams(req, res, next) {
 };
 
 async function getElement(req, res) {
-    /**
-     * Maybe in the future you want to search for categories indexed by date
-     */
     let response;
     switch(req.params.tree) {
         case "categories":
             provider = new CategoryProvider();
+            /**
+            * Maybe in the future you want to search for categories indexed by date
+            * Here I set the index
+            */
             provider.setIndex(categories);
             if(!isFixed) {
                 log.info("tree.js: getElement for " + req.params.tree + " without fixedLevel");
@@ -145,6 +146,10 @@ async function getElement(req, res) {
             break;
         case "psychographics":
             provider = new PsychographicProvider();
+            /**
+            * Maybe in the future you want to search for categories indexed by date
+            * Here I set the index
+            */
             provider.setIndex(psychographics);
             if(!isFixed) {
                 log.info("tree.js: getElement for " + req.params.tree + " without fixedLevel");
