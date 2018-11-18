@@ -33,7 +33,7 @@ The application responds to the following HTTP GET requests:
     * description(ex: This group responds...)
     * ico (ex: abc)
     * addonId (ex: cy)
-* `\fixedCategories`, In order to search in a certain level. Query string params accepted:
+* `/fixedCategories`, In order to search in a certain level. Query string params accepted:
     * fixedLevel (ex: 2) MANDATORY
     * name (ex: Punk)
     * id (ex: 1)
@@ -44,7 +44,7 @@ The application responds to the following HTTP GET requests:
     * l4 (ex: -2)
     * pic (ex: /assets/img/categories/category_343.jpg)
     * type (ex: audience)
-* `\fixedPsychographics`, In order to search in a certain level. Query string params accepted:
+* `/fixedPsychographics`, In order to search in a certain level. Query string params accepted:
     * fixedLevel (ex: 2) MANDATORY
     * label (ex: Advertising)
     * id (ex: Adv Strategy)
