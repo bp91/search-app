@@ -38,9 +38,3 @@ h1, h2, h3, h4, h5, h6 {
 .row-line {
     margin-top: 80px;
 }
-
-.logo {
-	height: 30px;
-	background: url("../../img/igenius.png") no-repeat;
-	margin: 10px 0px 20px 20px;
-}

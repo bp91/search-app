@@ -34,11 +34,11 @@
             <div class="col-md-4 col-lg-4">
             </div>
         </div>
-        <div class="row">
+        <div class="row resultsAndFilter">
             <div class="col-xs-4 filters">
                 <div class="row operator">
                     <div class="col-xs-6">
-                        <select>
+                        <select v-model="selectedOperator">
                             <option v-for="operator in operators" :key="operator">{{operator}}</option>
                         </select>
                     </div>
@@ -71,23 +71,18 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-12 activeFilters">
-                        <div class="activeFilter" v-for="filter in activeFilters" :key="getFilterValue(filter, getFilterKey(filter))">
+                        <div class="activeFilter" v-for="(filter, index) in activeFilters" :key="getFilterKey(filter)">
                             <label>
                                 {{getFilterKey(filter)}} : {{getFilterValue(filter, getFilterKey(filter))}}
                             </label>
-                            <i class="fa fa-times"></i>
+                            <i class="fa fa-times" @click="removeFilter(index)"></i>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-xs-8 results">
                 <div class="resultsBox" v-for="(document, index) in results" :key="index">
-                    <div v-if="selectedIndex == 'categories'">
-                        <document-category></document-category>
-                    </div>
-                    <div v-if="selectedIndex == 'psychographics'">
-                        <document-psychographic></document-psychographic>
-                    </div>
+                    <document :documentType="selectedIndex" :documents="results"></document>
                 </div>
             </div>
             <div class="col-xs-2">
@@ -98,8 +93,7 @@
 <script>
     import axios from 'axios';
     import jsonArray from 'json-array-split';
-    import DocumentCategory from'@/components/DocumentCategory.vue';
-    import DocumentPsychographic from'@/components/DocumentPsychographic.vue';
+    import Document from'@/components/Document.vue';
 
     const env = process.env.NODE_ENV || 'development';
     const config = require("../../config/config.json").server[env];
@@ -121,17 +115,40 @@
                 ],
                 results : [],
                 operators : ["AND", "OR"],
+                selectedOperator : "AND",
                 selectedIndex : "categories",
+                isFixed : false,
                 activeFilters : {},
                 filterName : "None",
                 filterValue : "",
                 categoriesFilters : [],
-                psychographicsFilters : []
+                psychographicsFilters : [],
+                queries : [
+                    {
+                        isFixed : false,
+                        selectedIndex : "categories",
+                        query : "categories"
+                    },
+                    {
+                        isFixed : true,
+                        selectedIndex : "categories",
+                        query : "fixedCategories"
+                    },
+                    {
+                        isFixed : false,
+                        selectedIndex : "psychographics",
+                        query : "psychographics"
+                    },
+                    {
+                        isFixed : true,
+                        selectedIndex : "psychographics",
+                        query : "fixedPsychographics"
+                    }
+                ]
             }
         },
         components : {
-            DocumentCategory,
-            DocumentPsychographic
+            Document
         },
         mounted() {
             this.searchInput = this.$store.state.searchInput != undefined ? this.$store.state.searchInput : "";
@@ -187,6 +204,11 @@
                     this.filterValue = "";
                     let me = this;
                     this.activeFilters = [];
+                    this.results = [];
+                    this.$store.state.selectedIndex = newValue;
+                    this.$store.state.activeFilters = [];
+                    this.$store.state.results = [];
+                    this.isFixed = false;
                 }
             },
             "filterName" : function(newValue, oldValue) {
@@ -263,99 +285,100 @@
             },
             checkParameters() {
                 let me = this;
-                if(this.searchInput != "" && this.selectedIndex != "") {
-                    let foundIndex = false;
-                    this.indices.forEach(function(index) {
-                        if(index.value == me.selectedIndex) {
-                            foundIndex = true;
-                        }
-                    });
-                    return foundIndex;
-                }else {
-                    return false;
-                }
+                let foundIndex = false;
+                this.indices.forEach(function(index) {
+                    if(index.value == me.selectedIndex) {
+                        foundIndex = true;
+                    }
+                });
+                return foundIndex;
             },
             refreshNameOrLabel() {
                 let indicesToRemove = [];
                 var i = 0;
                 this.activeFilters.forEach(function(f) {
+                    console.log(f);
                     for(var key in f) {
                         if(key == "name" || key == "label") {
                             indicesToRemove.push(i);
                         }
                     }
+                    i += 1;
                 });
                 let me = this;
                 indicesToRemove.forEach(function(index) {
                     me.activeFilters.splice(index, 1);
                 });
-                console.log(this.activeFilters);
             },
             createJSON() {
                 let json = {};
+                let fixedLevel = false;
                 this.activeFilters.forEach(function(f) {
                     for(var key in f) {
+                        if(key == "fixedLevel") {
+                            fixedLevel = true;
+                        }
                         json[key] = f[key];
                     }
                 });
+                if((this.activeFilters.length == 2 && !fixedLevel) || this.activeFilters.length > 2) {
+                    json["operator"] = this.selectedOperator.toLowerCase();
+                }
                 return json;
             },
-            sendRequest() {
-                if(this.checkParameters()) {
-                    let parameters;
-                    this.refreshNameOrLabel();
-                    if(this.searchInput != "") {
-                        if(this.selectedIndex == "categories") {
-                            let me = this;
-                            let noRepetition = this.activeFilters.filter(function(f) {
-                                if(Object.keys(f)[0] == "name") {
-                                    return f["name"] == me.searchInput
-                                }
-                            });
-                            if(noRepetition.length == 0) {
-                                this.activeFilters.push({
-                                    "name" : this.searchInput
-                                });
-                            }
-                        }else {
-                            let me = this;
-                            let noRepetition = this.activeFilters.filter(function(f) {
-                                if(Object.keys(f)[0] == "label") {
-                                    return f["label"] == me.searchInput
-                                }
-                            });
-                            if(noRepetition.length == 0) {
-                                this.activeFilters.push({
-                                    "label" : this.searchInput
-                                });
-                            }
-                        }
+            getQuery() {
+                let selectedQuery = "";
+                let me = this;
+                this.queries.forEach(function(query) {
+                    if(query.isFixed == me.isFixed && query.selectedIndex == me.selectedIndex) {
+                        selectedQuery = query.query;
                     }
-                    parameters = this.createJSON();
-                    axios.get(config.url + ":" + config.port + "/" + this.selectedIndex,{
-                    params : parameters
-                    }).then(response => {
-                        this.$store.state.results = response.data;
-                        this.$store.state.searchInput = this.searchInput;
-                        this.$store.state.indices = this.indices;
-                        this.$store.state.selectedIndex = this.selectedIndex;
-                        this.results = response.data;
-                    }).catch(error => {
-                        if(error.hasOwnProperty("response")) {
-                            if(error.response.hasOwnProperty("data")) {
-                                if(error.response.data.hasOwnProperty("message")) {
-                                    this.errorMessage = error.response.data.message;
-                                }else {
-                                    this.errorMessage = error.response.data;
-                                }
+                });
+                return selectedQuery;
+            },
+            sendRequest() {
+                let parameters;
+                this.refreshNameOrLabel();
+                if(this.selectedIndex == "categories") {
+                    let me = this;
+                    if(this.searchInput != "") {
+                        this.activeFilters.push({
+                            "name" : this.searchInput
+                        });
+                    }
+                }else {
+                    let me = this;
+                    if(this.searchInput != "") {
+                        this.activeFilters.push({
+                            "label" : this.searchInput
+                        });
+                    }
+                }
+                parameters = this.createJSON();
+                axios.get(config.url + ":" + config.port + "/" + this.getQuery(),{
+                params : parameters
+                }).then(response => {
+                    this.results.length = 0;
+                    this.results = response.data;
+                    this.$store.state.results = response.data;
+                    this.$store.state.searchInput = this.searchInput;
+                    this.$store.state.indices = this.indices;
+                    this.$store.state.selectedIndex = this.selectedIndex;
+                }).catch(error => {
+                    if(error.hasOwnProperty("response")) {
+                        if(error.response.hasOwnProperty("data")) {
+                            if(error.response.data.hasOwnProperty("message")) {
+                                this.errorMessage = error.response.data.message;
                             }else {
-                                this.errorMessage = error.response;
+                                this.errorMessage = error.response.data;
                             }
                         }else {
-                            this.errorMessage = error;
+                            this.errorMessage = error.response;
                         }
-                    });
-                }
+                    }else {
+                        this.errorMessage = error;
+                    }
+                });
             },
             checkFilterNone() {
                 if(this.filterName != "None") {
@@ -364,12 +387,47 @@
                     return false;
                 }
             },
+            checkNoRepetitionInFilters(value) {
+                let me = this;
+                let noRepetition = this.activeFilters.filter(function(f) {
+                    return Object.keys(f)[0] == value;
+                });
+                if(noRepetition.length == 0) {
+                    return true;
+                }else {
+                    return false;
+                }
+            },
+            removeFilter(index) {
+                console.log(this.activeFilters[index]);
+                if(Object.keys(this.activeFilters[index])[0] == "fixedLevel") {
+                    this.isFixed = false;
+                }
+                this.activeFilters.splice(index, 1);
+                this.sendRequest();
+            },
             addFilter() {
                 if(this.filterValue != "") {
-                    const filterName = this.filterName;
-                    this.activeFilters.push({
-                        filterName : this.filterValue
+                    if(this.checkNoRepetitionInFilters(this.filterName)) {
+                        let filterName = this.filterName;
+                        let obj = {};
+                        obj[this.filterName] = this.filterValue;
+                        this.activeFilters.push(obj);
+                    }
+                }
+                if(this.filterName != "fixedLevel") {
+                    this.sendRequest();
+                }else {
+                    let hasNameFilter = false;
+                    this.activeFilters.forEach(function(a) {
+                        if(Object.keys(a)[0] == "name" || Object.keys(a)[0] == "label") {
+                            hasNameFilter = true;
+                        }
                     });
+                    this.isFixed = true;
+                    if(hasNameFilter) {
+                        this.sendRequest();
+                    }
                 }
             },
             detectEnterSearch(event) {
@@ -383,12 +441,9 @@
                 event = (event) ? event : window.event;
                 var charCode = (event.which) ? event.which : eventa.keyCode;
                 if(event.keyCode === 13) {
-					if(this.filterValue != "") {
-                        const filterName = this.filterName;
-                        this.activeFilters.push({
-                            filterName : this.filterValue
-                        });
-					}
+                    if(this.checkNoRepetitionInFilters(this.filterName)) {
+                        this.addFilter();
+                    }
 				}else {
                     let me = this;
                     let typeFilter = "";
@@ -397,15 +452,19 @@
                             return f.value == me.filterName;
                         });
                     }else {
-                        typeFilter = this.categoriesFilters.filter(function(f) {
+                        typeFilter = this.psychographicsFilters.filter(function(f) {
                             return f.value == me.filterName;
                         });
                     }
                     if(typeFilter[0].type == "int") {
-                        if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
-                            event.preventDefault();;
+                        if ((charCode > 31 && (charCode < 48 || (charCode > 57 && charCode != 189))) && charCode !== 46) {
+                            event.preventDefault();
                         } else {
-                            return true;
+                            if(charCode == 189 && this.filterValue.indexOf("-") > -1) {
+                                event.preventDefault();
+                            }else {
+                                return true;
+                            }
                         }
                     }else {
                         return true;
@@ -509,11 +568,16 @@
     .activeFilters {
         display: flex;
         flex-wrap: wrap;
+        margin-left: 44px;
     }
 
     .activeFilter i {
         cursor: pointer;
         margin-left: 6px;
+    }
+
+    .resultsAndFilter {
+        margin-top: 50px;
     }
 </style>
 
