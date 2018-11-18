@@ -17,7 +17,7 @@
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 inputBox">
                 <div class="row">
                     <div class="col-xs-12">
-                        <input type="text" v-model="searchInput"/>
+                        <input type="text" v-model="searchInput" @keydown="detectEnterSearch"/>
                     </div>
                 </div>
                 <div class="row">
@@ -53,7 +53,8 @@
                         </select>
                     </div>
                     <div class="col-xs-6 categoryFilterValue" v-if="checkFilterNone()">
-                        <input type="text" v-model="filterValue"/>
+                        <input type="text" v-model="filterValue" @keydown="detectEnterFilter"/>
+                        <i class="fa fa-plus" @click="addFilter"></i>
                     </div>
                 </div>
                 <div class="row" v-if="selectedIndex == 'psychographics'">
@@ -64,7 +65,18 @@
                         </select>
                     </div>
                     <div class="col-xs-6 categoryPsychographicValue" v-if="checkFilterNone()">
-                        <input type="text" v-model="filterValue"/>
+                        <input type="text" v-model="filterValue" @keydown="detectEnterFilter"/>
+                        <i class="fa fa-plus" @click="addFilter"></i>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 activeFilters">
+                        <div class="activeFilter" v-for="filter in activeFilters" :key="getFilterValue(filter, getFilterKey(filter))">
+                            <label>
+                                {{getFilterKey(filter)}} : {{getFilterValue(filter, getFilterKey(filter))}}
+                            </label>
+                            <i class="fa fa-times"></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,10 +137,34 @@
             this.searchInput = this.$store.state.searchInput != undefined ? this.$store.state.searchInput : "";
             this.indices = this.$store.state.indices != undefined ? this.$store.state.indices : this.indices;
             this.selectedIndex = this.$store.state.selectedIndex != undefined? this.$store.state.selectedIndex : "";
-            this.activeFilters = this.$store.state.activeFilters != undefined? this.$store.state.activeFilters : {};
+            this.activeFilters = this.$store.state.activeFilters != undefined? this.$store.state.activeFilters : [];
             this.results = this.$store.state.results != undefined? this.$store.state.results : [];
             if(this.searchInput != "") {
-                this.activeFilters["name"] = this.searchInput;
+                if(this.selectedIndex == "categories") {
+                    let me = this;
+                    let noRepetition = this.activeFilters.filter(function(f) {
+                        if(Object.keys(f)[0] == "name") {
+                            return f["name"] == me.searchInput
+                        }
+                    });
+                    if(noRepetition.length == 0) {
+                        this.activeFilters.push({
+                            "name" : this.searchInput
+                        });
+                    }
+                }else {
+                    let me = this;
+                    let noRepetition = this.activeFilters.filter(function(f) {
+                        if(Object.keys(f)[0] == "label") {
+                            return f["label"] == me.searchInput
+                        }
+                    });
+                    if(noRepetition.length == 0) {
+                        this.activeFilters.push({
+                            "label" : this.searchInput
+                        });
+                    }
+                }
             }
             if(this.categoriesFilters.length == 0) {
                 this.getCategoriesSchema();
@@ -149,6 +185,13 @@
                 if(newValue != oldValue) {
                     this.filterName = "None";
                     this.filterValue = "";
+                    let me = this;
+                    this.activeFilters = [];
+                }
+            },
+            "filterName" : function(newValue, oldValue) {
+                if(newValue != oldValue) {
+                    this.filterValue = "";
                 }
             }
         },
@@ -159,8 +202,12 @@
                     if(response.data.hasOwnProperty("message")) {
                         for(var key in response.data.value) {
                             let obj = response.data.value[key];
-                            obj["name"] = key;
-                            this.categoriesFilters.push(obj);
+                            if(obj.type == "string" || obj.type == "int") {
+                                if(key != "name" && key != undefined) {
+                                    obj["name"] = key;
+                                    this.categoriesFilters.push(obj);
+                                }
+                            }
                         }
                     }else {
                         this.categoriesFilters = response.data;
@@ -187,8 +234,12 @@
                     if(response.data.hasOwnProperty("message")) {
                         for(var key in response.data.value) {
                             let obj = response.data.value[key];
-                            obj["name"] = key;
-                            this.psychographicsFilters.push(obj);
+                            if(obj.type == "string" || obj.type == "int") {
+                                if(key != "label" && key != undefined) {
+                                    obj["name"] = key;
+                                    this.psychographicsFilters.push(obj);
+                                }
+                            }
                         }
                     }else {
                         this.psychographicsFilters = response.data;
@@ -224,12 +275,65 @@
                     return false;
                 }
             },
+            refreshNameOrLabel() {
+                let indicesToRemove = [];
+                var i = 0;
+                this.activeFilters.forEach(function(f) {
+                    for(var key in f) {
+                        if(key == "name" || key == "label") {
+                            indicesToRemove.push(i);
+                        }
+                    }
+                });
+                let me = this;
+                indicesToRemove.forEach(function(index) {
+                    me.activeFilters.splice(index, 1);
+                });
+                console.log(this.activeFilters);
+            },
+            createJSON() {
+                let json = {};
+                this.activeFilters.forEach(function(f) {
+                    for(var key in f) {
+                        json[key] = f[key];
+                    }
+                });
+                return json;
+            },
             sendRequest() {
                 if(this.checkParameters()) {
-                    axios.get(config.url + ":" + config.port + "/" + this.selectedIndex,{
-                    params : {
-                        name : this.searchInput
+                    let parameters;
+                    this.refreshNameOrLabel();
+                    if(this.searchInput != "") {
+                        if(this.selectedIndex == "categories") {
+                            let me = this;
+                            let noRepetition = this.activeFilters.filter(function(f) {
+                                if(Object.keys(f)[0] == "name") {
+                                    return f["name"] == me.searchInput
+                                }
+                            });
+                            if(noRepetition.length == 0) {
+                                this.activeFilters.push({
+                                    "name" : this.searchInput
+                                });
+                            }
+                        }else {
+                            let me = this;
+                            let noRepetition = this.activeFilters.filter(function(f) {
+                                if(Object.keys(f)[0] == "label") {
+                                    return f["label"] == me.searchInput
+                                }
+                            });
+                            if(noRepetition.length == 0) {
+                                this.activeFilters.push({
+                                    "label" : this.searchInput
+                                });
+                            }
+                        }
                     }
+                    parameters = this.createJSON();
+                    axios.get(config.url + ":" + config.port + "/" + this.selectedIndex,{
+                    params : parameters
                     }).then(response => {
                         this.$store.state.results = response.data;
                         this.$store.state.searchInput = this.searchInput;
@@ -253,26 +357,66 @@
                     });
                 }
             },
-            changedFilter(event) {
-                let oldFilter = "";
-                for(var key in this.activeFilters) {
-                    if(key != "name" && key != "label" && key != "fixedLevel") {
-                        oldFilter = key;
-                        break;
-                    }
-                }
-                delete this.activeFilters[oldFilter];
-                this.activeFilters.push({
-                    "name" : event.target.value,
-                    "value" : ""
-                })
-            },
             checkFilterNone() {
                 if(this.filterName != "None") {
                     return true;
                 }else {
                     return false;
                 }
+            },
+            addFilter() {
+                if(this.filterValue != "") {
+                    const filterName = this.filterName;
+                    this.activeFilters.push({
+                        filterName : this.filterValue
+                    });
+                }
+            },
+            detectEnterSearch(event) {
+                if(event.keyCode === 13) {
+					if(this.searchInput != "") {
+						this.sendRequest();
+					}
+				}
+            },
+            detectEnterFilter(event) {
+                event = (event) ? event : window.event;
+                var charCode = (event.which) ? event.which : eventa.keyCode;
+                if(event.keyCode === 13) {
+					if(this.filterValue != "") {
+                        const filterName = this.filterName;
+                        this.activeFilters.push({
+                            filterName : this.filterValue
+                        });
+					}
+				}else {
+                    let me = this;
+                    let typeFilter = "";
+                    if(this.selectedIndex == "categories") {
+                        typeFilter = this.categoriesFilters.filter(function(f) {
+                            return f.value == me.filterName;
+                        });
+                    }else {
+                        typeFilter = this.categoriesFilters.filter(function(f) {
+                            return f.value == me.filterName;
+                        });
+                    }
+                    if(typeFilter[0].type == "int") {
+                        if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+                            event.preventDefault();;
+                        } else {
+                            return true;
+                        }
+                    }else {
+                        return true;
+                    }
+                }
+            },
+            getFilterKey(filter) {
+                return Object.keys(filter)[0];
+            },
+            getFilterValue(filter, key) {
+                return filter[key];
             }
         }
     };
@@ -318,6 +462,7 @@
     .buttonDisabled {
         background-color: #88e88c;
     }
+
     .categoryFilterValue input,
     .categoryPsychographicValue input {
         padding: 0px 0px;
@@ -327,11 +472,48 @@
         -webkit-box-sizing: border-box;
         box-sizing: border-box;
     }
+
     .categoryFilterValue {
         margin-left: -70px;
     }
-    .categoryPsychographicValue {
+
+    .categoryFilterValue i {
+        cursor: pointer;
+        color: white;
+        margin-left: 10px;
+    }
+
+    .categoryPsychographicValue {
        margin-left: -70px; 
+    }
+
+    .categoryPsychographicValue i {
+        cursor: pointer;
+        color: white;
+        margin-left: 10px;
+    }
+
+    .resultsBox {
+        color: white;
+    }
+
+    .activeFilter {
+        width: 120px;
+        border: 1px solid;
+        border-radius: 4px;
+        margin: 4px 5px;
+        background: #45a049;
+        color: white;
+    }
+
+    .activeFilters {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .activeFilter i {
+        cursor: pointer;
+        margin-left: 6px;
     }
 </style>
 

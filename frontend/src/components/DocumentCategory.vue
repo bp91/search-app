@@ -69,7 +69,7 @@ export default {
 </script>
 <style>
     .rowDocumentContainer {
-        border-bottom: 1px solid grey;
+        border-bottom: 1px solid white;
     }
     .labelTitle label {
         float: left;

@@ -19,7 +19,7 @@ export default new Vuex.Store({
         }
     ],
     selectedIndex: "categories",
-    activeFilters : {},
+    activeFilters : [],
     categoriesFilters: [],
     psychographicsFilters: [],
     results: {}

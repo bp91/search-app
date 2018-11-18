@@ -17,7 +17,7 @@
             <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 inputBox">
                 <div class="row">
                     <div class="col-xs-12">
-                        <input type="text" v-model="searchInput"/>
+                        <input type="text" v-model="searchInput" @keydown="detectEnterSearch"/>
                     </div>
                 </div>
                 <div class="row">
@@ -112,11 +112,22 @@
                         }
                     });
                 }
+            },
+            detectEnterSearch(event) {
+                if(event.keyCode === 13) {
+					if(this.searchInput != "") {
+						this.sendRequest();
+					}
+				}
             }
         }
     };
 </script>
 <style>
+    .boxContainer {
+        margin-top: 80px;
+    }
+    
     .inputBox input {
         width: 100%;
     }
