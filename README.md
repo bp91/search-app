@@ -114,4 +114,4 @@ In order to run the Docker environment:
 * `docker-compose up -d`
 
 In this way, you can run the application on the url:
-* http://localhost
+* `http://localhost`
