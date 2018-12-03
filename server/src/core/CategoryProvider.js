@@ -41,10 +41,10 @@ CategoryProvider.prototype.getSchemaFields = function() {
     return fields;
 };
 
-CategoryProvider.prototype.getCategories = async function(params) {
+CategoryProvider.prototype.getCategories = function(params) {
     log.info("CategoryProvider.js: getCategories");
     try {
-        response = await SearchUtils.recursiveSearch(this.index, fields, params);
+        response = SearchUtils.recursiveSearch(this.index, fields, params);
         return  {
             "status" : response.status,
             "message" : response.value
@@ -60,11 +60,11 @@ CategoryProvider.prototype.getCategories = async function(params) {
     }
 };
 
-CategoryProvider.prototype.getCategoriesFromLayer = async function(params) {
+CategoryProvider.prototype.getCategoriesFromLayer = function(params) {
     try {
         const jumpLevel = params.fixedLevel;
         delete params.fixedLevel;
-        response = await SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
+        response = SearchUtils.recursiveSearch(this.index, fields, params, undefined, undefined, jumpLevel);
         return  {
             "status" : response.status,
             "message" : response.value

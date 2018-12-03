@@ -80,7 +80,7 @@ function findSublayer(fields, sub) {
 /**
  * Recursive method in order to deep search if it's necessary
  */
-async function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
+function recursiveSearch(index, fields, params, layer, resp, jumpLevel) {
     log.info("SearchUtils: recursiveSearch: with params: ", params, layer, resp, jumpLevel);
     if(resp == undefined) {
         resp = [];

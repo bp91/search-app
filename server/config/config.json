@@ -8,6 +8,10 @@
       "port": 5432,
       "dialect": "postgres"
     },
+    "elasticsearch" : {
+      "server" : "localhost",
+      "port" : 9200
+    },
     "server_host" : "http://localhost:8081"
   },
   "production": {
